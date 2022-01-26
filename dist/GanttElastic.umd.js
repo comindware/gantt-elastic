@@ -1114,7 +1114,7 @@ module.exports = g;
 /* harmony import */ var _node_modules_vue_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_GanttElastic_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 /* harmony import */ var _node_modules_vue_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_GanttElastic_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_vue_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_GanttElastic_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__);
 /* unused harmony reexport * */
- /* unused harmony default export */ var _unused_webpack_default_export = (_node_modules_vue_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_GanttElastic_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
 
 /***/ }),
 /* 9 */
@@ -1125,7 +1125,7 @@ exports = module.exports = __webpack_require__(10)(false);
 
 
 // module
-exports.push([module.i, "\n[class^='gantt-elastic'],\r\n[class*=' gantt-elastic'] {\r\n  box-sizing: border-box;\n}\n.gantt-elastic__main-view svg {\r\n  display: block;\n}\n.gantt-elastic__grid-horizontal-line,\r\n.gantt-elastic__grid-vertical-line {\r\n  stroke: #a0a0a0;\r\n  stroke-width: 1;\n}\nforeignObject > * {\r\n  margin: 0px;\n}\n.gantt-elastic .p-2 {\r\n  padding: 10rem;\n}\n.gantt-elastic__main-view-main-container,\r\n.gantt-elastic__main-view-container {\r\n  overflow: hidden;\r\n  max-width: 100%;\n}\n.gantt-elastic__task-list-header-column:last-of-type {\r\n  border-right: 1px solid #00000050;\n}\n.gantt-elastic__task-list-item:last-of-type {\r\n  border-bottom: 1px solid #00000050;\n}\n.gantt-elastic__task-list-item-value-wrapper:hover {\r\n  overflow: visible !important;\n}\n.gantt-elastic__task-list-item-value-wrapper:hover > .gantt-elastic__task-list-item-value-container {\r\n  position: relative;\r\n  overflow: visible !important;\n}\n.gantt-elastic__task-list-item-value-wrapper:hover > .gantt-elastic__task-list-item-value {\r\n  position: absolute;\n}\r\n", ""]);
+exports.push([module.i, "\n[class^='gantt-elastic'],\n[class*=' gantt-elastic'] {\n  box-sizing: border-box;\n}\n.gantt-elastic__main-view svg {\n  display: block;\n}\n.gantt-elastic__grid-horizontal-line,\n.gantt-elastic__grid-vertical-line {\n  stroke: #a0a0a0;\n  stroke-width: 1;\n}\nforeignObject > * {\n  margin: 0px;\n}\n.gantt-elastic .p-2 {\n  padding: 10rem;\n}\n.gantt-elastic__main-view-main-container,\n.gantt-elastic__main-view-container {\n  overflow: hidden;\n  max-width: 100%;\n}\n.gantt-elastic__task-list-header-column:last-of-type {\n  border-right: 1px solid #00000050;\n}\n.gantt-elastic__task-list-item:last-of-type {\n  border-bottom: 1px solid #00000050;\n}\n.gantt-elastic__task-list-item-value-wrapper:hover {\n  overflow: visible !important;\n}\n.gantt-elastic__task-list-item-value-wrapper:hover > .gantt-elastic__task-list-item-value-container {\n  position: relative;\n  overflow: visible !important;\n}\n.gantt-elastic__task-list-item-value-wrapper:hover > .gantt-elastic__task-list-item-value {\n  position: absolute;\n}\n", ""]);
 
 // exports
 
@@ -1910,7 +1910,12 @@ function normalizeComponent (
     options._ssrRegister = hook
   } else if (injectStyles) {
     hook = shadowMode
-      ? function () { injectStyles.call(this, this.$root.$options.shadowRoot) }
+      ? function () {
+        injectStyles.call(
+          this,
+          (options.functional ? this.parent : this).$root.$options.shadowRoot
+        )
+      }
       : injectStyles
   }
 
@@ -1919,7 +1924,7 @@ function normalizeComponent (
       // for template-only hot-reload because in that case the render fn doesn't
       // go through the normalizer
       options._injectStyles = hook
-      // register for functioal component in vue file
+      // register for functional component in vue file
       var originalRender = options.render
       options.render = function renderWithStyleInjection (h, context) {
         hook.call(context)
@@ -4309,9 +4314,10 @@ DependencyLinesvue_type_template_id_f1cbf6ba_render._withStripped = true
      *
      * @param {any} fromTaskId
      * @param {any} toTaskId
-     * @returns {string}
+     * @param {any} dependencyType
+     * @returns {string|null}
      */
-    getPoints(fromTaskId, toTaskId) {
+    getPoints(fromTaskId, toTaskId, dependencyType) {
       const fromTask = this.root.getTask(fromTaskId);
       const toTask = this.root.getTask(toTaskId);
       if (
@@ -4322,10 +4328,30 @@ DependencyLinesvue_type_template_id_f1cbf6ba_render._withStripped = true
       ) {
         return null;
       }
-      const startX = fromTask.isPlanned ? fromTask.xP + fromTask.widthP : fromTask.x + fromTask.width;
+
+      let startX, stopX;
+      switch (dependencyType) {
+        case 'startToStart':
+          startX = fromTask.isPlanned ? fromTask.xP : fromTask.x;
+          stopX = toTask.isPlanned ? toTask.xP : toTask.x;
+          break;
+        case 'endToEnd':
+          startX = fromTask.isPlanned ? fromTask.xP + fromTask.widthP : fromTask.x + fromTask.width;
+          stopX = toTask.isPlanned ? toTask.xP + toTask.widthP : toTask.x + toTask.width;
+          break;
+        case 'startToEnd':
+          startX = fromTask.isPlanned ? fromTask.xP : fromTask.x;
+          stopX = toTask.isPlanned ? toTask.xP + toTask.widthP : toTask.x + toTask.width;
+          break;
+        case 'endToStart':
+        default:
+          startX = fromTask.isPlanned ? fromTask.xP + fromTask.widthP : fromTask.x + fromTask.width;
+          stopX = toTask.isPlanned ? toTask.xP : toTask.x;
+          break;
+      }
       const startY = fromTask.isPlanned ? fromTask.yP + fromTask.height / 2 : fromTask.y + fromTask.height / 2;
-      const stopX = toTask.isPlanned ? toTask.xP : toTask.x;
       const stopY = toTask.isPlanned ? toTask.yP + toTask.height / 2: toTask.y + toTask.height / 2;
+
       const distanceX = stopX - startX;
       let distanceY;
       let yMultiplier = 1;
@@ -4374,8 +4400,8 @@ DependencyLinesvue_type_template_id_f1cbf6ba_render._withStripped = true
       return this.tasks
         .filter(task => typeof task.dependentOn !== 'undefined')
         .map(task => {
-          task.dependencyLines = task.dependentOn.map(id => {
-            return { points: this.getPoints(id, task.id), task_id: id };
+          task.dependencyLines = task.dependentOn.map(item => {
+            return { points: this.getPoints(item.previousTask, task.id, item.dependencyType), task_id: item.previousTask};
           });
           return task;
         })

@@ -5,17 +5,20 @@ const TerserPlugin = require('terser-webpack-plugin');
 module.exports = [
   {
     mode: 'production',
-    entry: './src/bundle.js',
+    entry: {
+      './standalone': './src/bundle.js',
+      './standalone.min': './src/bundle.js'
+    },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'standalone.js'
+      filename: '[name].js'
     },
     devtool: 'source-map',
     optimization: {
       minimize: true,
-      namedModules: false,
       minimizer: [
         new TerserPlugin({
+          include: /\.min\.js$/,
           terserOptions: {
             mangle: false
           }
@@ -24,6 +27,16 @@ module.exports = [
     },
     module: {
       rules: [
+        {
+          test: /\.js$/,
+          exclude: /(node_modules|bower_components)/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: ['@babel/preset-env']
+            }
+          }
+        },
         {
           test: /\.vue$/,
           use: 'vue-loader'
@@ -38,10 +51,13 @@ module.exports = [
   },
   {
     mode: 'production',
-    entry: './src/bundle.js',
+    entry: {
+      './bundle': './src/bundle.js',
+      './bundle.min': './src/bundle.js'
+    },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'bundle.js'
+      filename: '[name].js'
     },
     devtool: 'source-map',
     externals: {
@@ -51,9 +67,9 @@ module.exports = [
     },
     optimization: {
       minimize: true,
-      namedModules: false,
       minimizer: [
         new TerserPlugin({
+          include: /\.min\.js$/,
           terserOptions: {
             mangle: false
           }
@@ -67,6 +83,16 @@ module.exports = [
     },*/
     module: {
       rules: [
+        {
+          test: /\.js$/,
+          exclude: /(node_modules|bower_components)/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: ['@babel/preset-env']
+            }
+          }
+        },
         {
           test: /\.vue$/,
           use: 'vue-loader'

@@ -1,4 +1,6 @@
 .vscode/
+.idea/
 .sonarlint/
 node_modules/
 .history
+tests/screenshots
