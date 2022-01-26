@@ -18,6 +18,9 @@ jobs:
         run: |
           npm ci
           npx cypress install
+
+          # update version before build
+          npm version ${{ github.event.release.tag_name }}
           npm run build
 
       - name: Test
@@ -28,8 +31,7 @@ jobs:
 
       - name: Publish
         run: |
-          npm version ${{ github.event.release.tag_name }}
           npm publish
-          
+
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
