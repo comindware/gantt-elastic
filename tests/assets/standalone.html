@@ -333,11 +333,11 @@
           console.log('ready!', ganttInstance);
           window.ganttInstance = ganttInstance;
           ganttInstance.$on('tasks-changed', tasks => {
-            app.tasks = tasks;
+            // app.tasks = tasks;
           });
           ganttInstance.$on('options-changed', options => {
             console.log('options changed');
-            app.options = options;
+            // app.options = options;
           });
           ganttInstance.$on('dynamic-style-changed', style => {
             app.dynamicStyle = style;

@@ -14,7 +14,7 @@
     <div style="width:100%;height:100%">
       <div id="app" v-if="!destroy">
         <gantt-elastic :tasks="tasks" :options="options">
-          <gantt-header slot="header"></gantt-header>
+          <gantt-header slot="header" :options="{ slots: { header : {}}}"></gantt-header>
           <gantt-footer slot="footer"></gantt-footer>
         </gantt-elastic>
       </div>
@@ -373,10 +373,10 @@
         ganttInstance = window.ganttInstance = ganttElasticInstance;
 
         ganttInstance.$on('tasks-changed', tasks => {
-          app.tasks = tasks;
+          // app.tasks = tasks;
         });
         ganttInstance.$on('options-changed', options => {
-          app.options = options;
+          // app.options = options;
         });
         ganttInstance.$on('dynamic-style-changed', style => {
           app.dynamicStyle = style;
