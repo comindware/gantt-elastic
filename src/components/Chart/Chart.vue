@@ -30,22 +30,21 @@
       <div
         :style="{
           ...root.style['chart-area'],
-          width: root.state.options.width + 'px',
+          width: '100%',
           height: root.state.options.rowsHeight + 'px'
         }"
       >
         <div
           class="gantt-elastic__chart-graph"
           ref="chartGraph"
-          :style="{ ...root.style['chart-graph'], height: '100%' }"
+          :style="{ ...root.style['chart-graph'], height: '100%', width: '100%' }"
         >
           <svg
             class="gantt-elastic__chart-graph-svg"
-            :style="{ ...root.style['chart-graph-svg'] }"
+            :style="{ ...root.style['chart-graph-svg'], width: '100%'}"
             ref="chartGraphSvg"
             x="0"
             y="0"
-            :width="root.state.options.width + 'px'"
             :height="root.state.options.allVisibleTasksHeight + 'px'"
             xmlns="http://www.w3.org/2000/svg"
           >

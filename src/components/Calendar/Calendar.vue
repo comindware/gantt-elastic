@@ -9,9 +9,9 @@
 <template>
   <div
     class="gantt-elastic__calendar-wrapper"
-    :style="{ ...root.style['calendar-wrapper'], width: root.state.options.width + 'px' }"
+    :style="{ ...root.style['calendar-wrapper']}"
   >
-    <div class="gantt-elastic__calendar" :style="{ ...root.style['calendar'], width: root.state.options.width + 'px' }">
+    <div class="gantt-elastic__calendar" :style="{ ...root.style['calendar'] }">
       <calendar-row :items="dates.years" which="year" v-if="root.state.options.calendar.year.display"></calendar-row>
       <calendar-row :items="dates.quarters" which="quarter" v-if="root.state.options.calendar.quarter.display"></calendar-row>
       <calendar-row :items="dates.months" which="month" v-if="root.state.options.calendar.month.display"></calendar-row>
@@ -691,6 +691,9 @@ export default {
       }
       if (this.root.state.options.calendar.year.display && years.length > 0) {
         height += this.root.state.options.calendar.year.height;
+      }
+      if (height === 0) {
+        height += this.root.state.options.calendar.defaultHeight;
       }
       this.root.state.options.calendar.height = height;
     }

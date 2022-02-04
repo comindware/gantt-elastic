@@ -66,7 +66,7 @@ function getOptions(userOptions) {
       collapsed: 'collapsed'
     },
     width: 0,
-    height: 0,
+    height: 100,
     clientWidth: 0,
     outerHeight: 0,
     rowsHeight: 0,
@@ -184,6 +184,7 @@ function getOptions(userOptions) {
       workingDays: [1, 2, 3, 4, 5], //*
       gap: 6, //*
       height: 0,
+      defaultHeight: 28,
       strokeWidth: 1,
       hour: {
         height: 20, //*
@@ -1781,6 +1782,7 @@ foreignObject > * {
 .gantt-elastic__main-view-container {
   overflow: hidden;
   max-width: 100%;
+  width: 100%;
 }
 .gantt-elastic__task-list-header-column:last-of-type {
   border-right: 1px solid #00000050;
