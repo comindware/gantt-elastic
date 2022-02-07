@@ -28,7 +28,8 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       height: '100%'
     },
     'calendar-wrapper': {
-      'user-select': 'none'
+      'user-select': 'none',
+      width: '100%'
     },
     calendar: {
       width: '100%',
@@ -37,7 +38,8 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     },
     'calendar-row': {
       display: 'flex',
-      'justify-content': 'space-evenly'
+      'justify-content': 'space-evenly',
+      height: '28px'
     },
     'calendar-row--month': {},
     'calendar-row--day': {},
@@ -323,6 +325,17 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     },
     'slot-header-beforeOptions': {
       display: 'inline-block'
+    },
+    'emty-view': {
+      height:'100px',
+      'border-top': 'none'
+    },
+    'emty-view-text': {
+      'text-align': 'center',
+      'font-size': '1.1em',
+      'white-space': 'nowrap',
+      height:'100px',
+      border: '1px solid var(--editors-color-border)',
     }
   };
 }

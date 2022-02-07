@@ -71,6 +71,19 @@
         ></div>
       </div>
     </div>
+    <tbody
+          class="empty-view"
+          :style="{ ...root.style['emty-view'], width: root.state.options.clientWidth + 'px' }"
+          v-if="root.visibleTasks.length == 0"
+        >
+        <tr :style="{ display: 'table-row' }">
+          <td class="empty-view-text" 
+          :style="{ ...root.style['emty-view-text'], width: root.state.options.clientWidth + 'px'}
+          ">
+          {{root.state.options.emptyViewText }}
+          </td>
+        </tr>
+    </tbody>
     <div
       class="gantt-elastic__chart-scroll-container gantt-elastic__chart-scroll-container--horizontal"
       :style="{
