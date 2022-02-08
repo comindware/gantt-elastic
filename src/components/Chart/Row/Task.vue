@@ -79,7 +79,6 @@
           ...task.style['chart-row-bar-polygon']
         }"
       ></rect>
-      <progress-bar :task="task" :clip-path="'url(#' + clipPathId + ')'"></progress-bar>
     </svg>
     <foreignObject
       v-if="root.state.options.chart.title.display"
@@ -118,14 +117,12 @@
 
 <script>
 import ChartText from '../Text.vue';
-import ProgressBar from '../ProgressBar.vue';
 import Expander from '../../Expander.vue';
 import taskMixin from './Task.mixin.js';
 export default {
   name: 'Task',
   components: {
     ChartText,
-    ProgressBar,
     Expander
   },
   inject: ['root'],

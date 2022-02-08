@@ -115,7 +115,7 @@ function getOptions(userOptions) {
       stepDuration: 'day',
       steps: []
     },
-    showPlanned: true,
+    showExpected: true,
     row: {
       height: 24 //*
     },
@@ -1578,26 +1578,27 @@ const GanttElastic = {
           task.width = 0;
         }
 
-        if (this.state.options.showPlanned) {
-          task.isPlanned = task.startTimePlanned > 0 && task.durationPlanned > 0;
+        if (this.state.options.showExpected) {
           task.height = this.state.options.row.height / 2;
-          task.xP = this.timeToPixelOffsetX(task.startTimePlanned);
-          task.yP =
-            (this.state.options.row.height + this.state.options.chart.grid.horizontal.gap * 2) * index +
-            this.state.options.chart.grid.horizontal.gap + task.offsetYPlanned;
-          // parameters of planned task view
           task.x = this.timeToPixelOffsetX(task.startTime);
-          task.y = task.yP + task.height + task.offsetY - task.offsetYPlanned;
-          task.widthP = task.durationPlanned / this.state.options.times.timePerPixel - this.style['grid-line-vertical']['stroke-width'];
+          task.y =
+            (this.state.options.row.height + this.state.options.chart.grid.horizontal.gap * 2) * index +
+            this.state.options.chart.grid.horizontal.gap;
+          // parameters of planned task view
+          task.xP = this.timeToPixelOffsetX(task.startTimePlanned);
+          task.yP = task.y + task.height + task.offsetY + task.offsetYPlanned;
+          task.widthP =
+            task.durationPlanned / this.state.options.times.timePerPixel -
+            this.style['grid-line-vertical']['stroke-width'];
           if (task.widthP < 0) {
             task.widthP = 0;
           }
         } else {
           task.height = this.state.options.row.height;
-          task.x = this.timeToPixelOffsetX(task.startTime);
-          task.y =
+          task.xP = this.timeToPixelOffsetX(task.startTimePlanned);
+          task.yP =
             (this.state.options.row.height + this.state.options.chart.grid.horizontal.gap * 2) * index +
-            this.state.options.chart.grid.horizontal.gap + task.offsetY;
+            this.state.options.chart.grid.horizontal.gap;
         }
       }
       return visibleTasks;
