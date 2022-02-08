@@ -72,25 +72,25 @@ export default {
       let startX, stopX;
       switch (dependencyType) {
         case 'startToStart':
-          startX = fromTask.isPlanned ? fromTask.xP : fromTask.x;
-          stopX = toTask.isPlanned ? toTask.xP : toTask.x;
+          startX = fromTask.xP;
+          stopX = toTask.xP;
           break;
         case 'endToEnd':
-          startX = fromTask.isPlanned ? fromTask.xP + fromTask.widthP : fromTask.x + fromTask.width;
-          stopX = toTask.isPlanned ? toTask.xP + toTask.widthP : toTask.x + toTask.width;
+          startX = fromTask.xP + fromTask.widthP;
+          stopX = toTask.xP + toTask.widthP;
           break;
         case 'startToEnd':
-          startX = fromTask.isPlanned ? fromTask.xP : fromTask.x;
-          stopX = toTask.isPlanned ? toTask.xP + toTask.widthP : toTask.x + toTask.width;
+          startX = fromTask.xP;
+          stopX = toTask.xP + toTask.widthP;
           break;
         case 'endToStart':
         default:
-          startX = fromTask.isPlanned ? fromTask.xP + fromTask.widthP : fromTask.x + fromTask.width;
-          stopX = toTask.isPlanned ? toTask.xP : toTask.x;
+          startX = fromTask.xP + fromTask.widthP;
+          stopX = toTask.xP;
           break;
       }
-      const startY = fromTask.isPlanned ? fromTask.yP + fromTask.height / 2 : fromTask.y + fromTask.height / 2;
-      const stopY = toTask.isPlanned ? toTask.yP + toTask.height / 2: toTask.y + toTask.height / 2;
+      const startY = fromTask.yP + fromTask.height / 2;
+      const stopY = toTask.yP + toTask.height / 2;
 
       const distanceX = stopX - startX;
       let distanceY;

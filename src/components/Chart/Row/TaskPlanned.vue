@@ -48,9 +48,10 @@
           ...root.style['chart-row-bar-polygon'],
           ...root.style['chart-row-task-polygon'],
           ...task.style['base'],
-          ...task.style['chart-row-bar-polygon-estimated']
+          ...task.style['chart-row-bar-polygon-estimated'],
         }"
       ></rect>
+      <progress-bar :task="task" :clip-path="'url(#' + clipPathId + ')'"></progress-bar>
     </svg>
   </g>
 </template>
@@ -61,10 +62,20 @@ import ProgressBar from '../ProgressBar.vue';
 export default {
   name: 'Task',
   components: {
-    ProgressBar
+    ProgressBar,
   },
   inject: ['root'],
   props: ['task'],
-  mixins: [taskMixin]
+  mixins: [taskMixin],
+  computed: {
+    /**
+     * Get clip path id
+     *
+     * @returns {string}
+     */
+    clipPathId() {
+      return 'gantt-elastic__task-clip-path-' + this.task.id;
+    },
+  },
 };
 </script>
