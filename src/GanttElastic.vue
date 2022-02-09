@@ -580,6 +580,12 @@ const GanttElastic = {
         if (typeof task.y === 'undefined') {
           task.y = 0;
         }
+        if (typeof task.xP === 'undefined') {
+          task.xP = 0;
+        }
+        if (typeof task.yP === 'undefined') {
+          task.yP = 0;
+        }
         if (typeof task.width === 'undefined') {
           task.width = 0;
         }
@@ -1585,8 +1591,10 @@ const GanttElastic = {
             (this.state.options.row.height + this.state.options.chart.grid.horizontal.gap * 2) * index +
             this.state.options.chart.grid.horizontal.gap;
           // parameters of planned task view
-          this.$set(task, 'xP', this.timeToPixelOffsetX(task.startTimePlanned));
-          this.$set(task, 'yP', task.y + task.height + task.offsetY + task.offsetYPlanned);
+          task.xP = this.timeToPixelOffsetX(task.startTimePlanned);
+          task.yP = task.y + task.height + task.offsetY + task.offsetYPlanned
+          //this.$set(task, 'xP', this.timeToPixelOffsetX(task.startTimePlanned));
+         // this.$set(task, 'yP', task.y + task.height + task.offsetY + task.offsetYPlanned);
           task.widthP =
             task.durationPlanned / this.state.options.times.timePerPixel -
             this.style['grid-line-vertical']['stroke-width'];
