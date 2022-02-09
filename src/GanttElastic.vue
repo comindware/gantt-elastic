@@ -1593,8 +1593,6 @@ const GanttElastic = {
           // parameters of planned task view
           task.xP = this.timeToPixelOffsetX(task.startTimePlanned);
           task.yP = task.y + task.height + task.offsetY + task.offsetYPlanned
-          //this.$set(task, 'xP', this.timeToPixelOffsetX(task.startTimePlanned));
-         // this.$set(task, 'yP', task.y + task.height + task.offsetY + task.offsetYPlanned);
           task.widthP =
             task.durationPlanned / this.state.options.times.timePerPixel -
             this.style['grid-line-vertical']['stroke-width'];
