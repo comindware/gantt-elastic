@@ -580,6 +580,12 @@ const GanttElastic = {
         if (typeof task.y === 'undefined') {
           task.y = 0;
         }
+        if (typeof task.xP === 'undefined') {
+          task.xP = 0;
+        }
+        if (typeof task.yP === 'undefined') {
+          task.yP = 0;
+        }
         if (typeof task.width === 'undefined') {
           task.width = 0;
         }
