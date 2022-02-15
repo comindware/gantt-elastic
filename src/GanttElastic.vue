@@ -7,7 +7,7 @@
  */
 -->
 <template>
-  <div class="gantt-elastic" style="width:100%">
+  <div class="gantt-elastic" style="width:100%" @click="onClick">
     <slot name="header"></slot>
     <main-view ref="mainView"></main-view>
     <slot name="footer"></slot>
@@ -522,6 +522,10 @@ const GanttElastic = {
             left: 0,
             top: 0
           }
+        },
+        popupData: {
+          taskId: '',
+          prevTaskId: ''
         },
         dynamicStyle: {},
         refs: {},
@@ -1160,6 +1164,18 @@ const GanttElastic = {
     onTaskListColumnWidthChange() {
       this.calculateTaskListColumnsDimensions();
       this.fixScrollPos();
+    },
+
+    /**
+     * click event handler
+     */
+    onClick() {
+      if (this.state.refs.chartDependencyPopup) {
+        this.state.popupData = {
+          taskId: '',
+          prevTaskId: ''
+        };
+      }
     },
 
     /**
