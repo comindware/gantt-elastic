@@ -21,12 +21,13 @@
       }"
     ></div>
     <div
+      v-if="root.state.options.locale.dependencyPopup"
       class="gantt-elastic__chart-tasks-dependency-popup-title"
       :style="{
         ...root.style['dependency-popup-title'],
       }"
     >
-      {{ root.state.options.locale.dependencyPopup.workDependency }}
+      {{ root.state.options.locale.dependencyPopup.workDependency || '' }}
     </div>
     <div
       class="gantt-elastic__chart-tasks-dependency-popup-info-container"
@@ -70,13 +71,16 @@ export default {
   inject: ['root'],
   data() {
     return {
+      position: {
+        top: 0,
+        left: 0,
+      },
       styles: {},
     };
   },
   updated() {
-    const topStr = this.styles.top;
-    if (topStr) {
-      let top = parseInt(topStr.replace('px', ''));
+    const top = this.position.top;
+    if (top && this.$refs.popup) {
       const bottom = top + this.$refs.popup.offsetHeight;
       const chartHeight = this.root.state.refs.chartGraph.offsetHeight;
       this.styles.top =
@@ -160,13 +164,14 @@ export default {
           stopX = toTask.xP;
           break;
       }
-      const width = parseInt(defaultStyles.width.replace('px', ''));
-      const left = startX + (stopX - startX) / 2 - width / 2 + 'px';
-      const top = Math.max(fromTask.yP, toTask.yP) + this.root.state.options.row.height + 'px';
+      const popupWidth = this.root.state.options.dependencyPopup.width;
+      this.position.left = startX + (stopX - startX) / 2 - popupWidth / 2;
+      this.position.top = Math.max(fromTask.yP, toTask.yP) + this.root.state.options.row.height;
 
       this.styles = {
-        left,
-        top,
+        left: this.position.left + 'px',
+        top: this.position.top + 'px',
+        width: popupWidth + 'px',
         ...defaultStyles,
       };
     },
@@ -179,15 +184,18 @@ export default {
      * @returns {string} Formated and localized duration string (both formats defines by options)
      */
     getFormatedDuration(durationStr) {
-      const localization = this.root.state.options.locale.dependencyPopup.duration;
+      const popupLocalization = this.root.state.options.locale.dependencyPopup;
       const regexesAndLocalePropNames = this.root.state.options.meta.durationFormat;
       let formatedDuration = '';
-      regexesAndLocalePropNames.forEach((item) => {
-        const matched = durationStr.match(new RegExp(item.regexStr));
-        if (matched && matched.length) {
-          formatedDuration += localization[item.localePropName].replace('{0}', matched[0]);
-        }
-      });
+      if (popupLocalization && popupLocalization.duration && regexesAndLocalePropNames) {
+        const replaceLocalizationParams = this.root.state.options.locale.replaceParams;
+        regexesAndLocalePropNames.forEach((item) => {
+          const matched = durationStr.match(new RegExp(item.regexStr));
+          if (matched && matched.length) {
+            formatedDuration += replaceLocalizationParams(popupLocalization.duration[item.localePropName], matched[0]);
+          }
+        });
+      }
       return formatedDuration;
     },
   },
