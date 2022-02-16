@@ -29,11 +29,12 @@
     <g v-for="task in dependencyTasks" :key="task.id" :task="task">
       <path
         class="gantt-elastic__chart-dependency-lines-path"
-        :style="{ ...root.style['chart-dependency-lines-path'], ...task.style['chart-dependency-lines-path'], ...task.style['chart-dependency-lines-path-' + dependencyLine.task_id] }"
+        :style="{ ...root.style['chart-dependency-lines-path'], ...task.style['chart-dependency-lines-path'], ...task.style['chart-dependency-lines-path-' + dependencyLine.prevTaskId] }"
         v-for="dependencyLine in task.dependencyLines"
         :key="dependencyLine.id"
         :task="task"
         :d="dependencyLine.points"
+        @click.stop="onDependencyLineClick(dependencyLine)"
         marker-end="url(#gantt-elastic__chart-dependency-lines-marker)"
       ></path>
     </g>
@@ -128,6 +129,14 @@ export default {
             L ${stopX},${stopY}`;
       }
       return points;
+    },
+    onDependencyLineClick(dependencyLine){
+      if (this.root.state.refs.chartDependencyPopup) {
+        this.root.state.popupData = {
+          taskId: dependencyLine.taskId,
+          prevTaskId: dependencyLine.prevTaskId
+        };
+      }
     }
   },
   computed: {
@@ -141,7 +150,11 @@ export default {
         .filter(task => typeof task.dependentOn !== 'undefined')
         .map(task => {
           task.dependencyLines = task.dependentOn.map(item => {
-            return { points: this.getPoints(item.previousTask, task.id, item.dependencyType), task_id: item.previousTask};
+            return { 
+              points: this.getPoints(item.previousTask, task.id, item.dependencyType),
+              prevTaskId: item.previousTask,
+              taskId: task.id,
+            };
           });
           return task;
         })

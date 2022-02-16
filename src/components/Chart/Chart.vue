@@ -59,9 +59,10 @@
               :key="task.id"
             >
               <task-planned :task="task"></task-planned>
-              <component :task="task"  v-if="root.state.options.showExpected" :is="task.type"></component>
+              <component :task="task" v-if="root.state.options.showExpected" :is="task.type"></component>
             </g>
           </svg>
+          <dependency-popup ref="chartDependencyPopup"></dependency-popup>
         </div>
       </div>
     </div>
@@ -73,6 +74,7 @@ import Grid from './Grid.vue';
 import DaysHighlight from './DaysHighlight.vue';
 import Calendar from '../Calendar/Calendar.vue';
 import DependencyLines from './DependencyLines.vue';
+import DependencyPopup from './DependencyPopup.vue';
 import Task from './Row/Task.vue';
 import TaskPlanned from './Row/TaskPlanned.vue';
 import Milestone from './Row/Milestone.vue';
@@ -82,17 +84,18 @@ export default {
   components: {
     Grid,
     DependencyLines,
+    DependencyPopup,
     Calendar,
     Task,
     TaskPlanned,
     Milestone,
     Project,
-    DaysHighlight
+    DaysHighlight,
   },
   inject: ['root'],
   data() {
     return {
-      moving: false
+      moving: false,
     };
   },
   /**
@@ -103,6 +106,7 @@ export default {
     this.root.state.refs.chartCalendarContainer = this.$refs.chartCalendarContainer;
     this.root.state.refs.chartGraphContainer = this.$refs.chartGraphContainer;
     this.root.state.refs.chartGraph = this.$refs.chartGraph;
+    this.root.state.refs.chartDependencyPopup = this.$refs.chartDependencyPopup;
     this.root.state.refs.chartGraphSvg = this.$refs.chartGraphSvg;
   },
 
