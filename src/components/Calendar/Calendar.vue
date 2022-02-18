@@ -701,7 +701,7 @@ export default {
       for (let decadeIndex = 0; decadeIndex < decadesCount.count; decadeIndex++) {
         let decadeWidth = 0;
         let decadeOffset = Number.MAX_SAFE_INTEGER;
-        let finalDate = __addDecade(dayjs(currentDate))
+        let finalDate = this.__addDecade(dayjs(currentDate));
         if (finalDate.valueOf() > lastTime) {
           finalDate = dayjs(lastTime);
         }
@@ -739,7 +739,7 @@ export default {
           height: decade.height,
           label
         });
-        currentDate = __addDecade(currentDate);
+        currentDate = this.__addDecade(currentDate);
         if (currentDate.valueOf() > lastTime) {
           currentDate = dayjs(lastTime);
         }
