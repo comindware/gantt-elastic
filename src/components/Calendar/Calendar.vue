@@ -9,15 +9,16 @@
 <template>
   <div
     class="gantt-elastic__calendar-wrapper"
-    :style="{ ...root.style['calendar-wrapper']}"
+    :style="{ ...root.style['calendar-wrapper'], width: width + 'px'}"
   >
-    <div class="gantt-elastic__calendar" :style="{ ...root.style['calendar'] }">
-      <calendar-row :items="dates.years" which="year" v-if="root.state.options.calendar.year.display"></calendar-row>
-      <calendar-row :items="dates.quarters" which="quarter" v-if="root.state.options.calendar.quarter.display"></calendar-row>
-      <calendar-row :items="dates.months" which="month" v-if="root.state.options.calendar.month.display"></calendar-row>
-      <calendar-row :items="dates.weeks" which="week" v-if="root.state.options.calendar.week.display"></calendar-row>
-      <calendar-row :items="dates.days" which="day" v-if="root.state.options.calendar.day.display"></calendar-row>
-      <calendar-row :items="dates.hours" which="hour" v-if="root.state.options.calendar.hour.display"></calendar-row>
+    <div class="gantt-elastic__calendar" :style="{ ...root.style['calendar'], width: width + 'px'}">
+      <calendar-row :items="dates.decades" which="decade" v-if="calendar.decade.display"></calendar-row>
+      <calendar-row :items="dates.years" which="year" v-if="calendar.year.display"></calendar-row>
+      <calendar-row :items="dates.quarters" which="quarter" v-if="calendar.quarter.display"></calendar-row>
+      <calendar-row :items="dates.months" which="month" v-if="calendar.month.display"></calendar-row>
+      <calendar-row :items="dates.weeks" which="week" v-if="calendar.week.display"></calendar-row>
+      <calendar-row :items="dates.days" which="day" v-if="calendar.day.display"></calendar-row>
+      <calendar-row :items="dates.hours" which="hour" v-if="calendar.hour.display"></calendar-row>
     </div>
   </div>
 </template>
@@ -32,6 +33,7 @@ export default {
     CalendarRow
   },
   inject: ['root'],
+  props: ['calendar', 'times', 'locale', 'width'],
   data() {
     return {};
   },
@@ -45,12 +47,12 @@ export default {
     howManyHoursFit(dayIndex) {
       const stroke = 1;
       const additionalSpace = stroke + 2;
-      let fullCellWidth = this.root.state.options.times.steps[dayIndex].width.px;
-      let formatNames = Object.keys(this.root.state.options.calendar.hour.format);
+      let fullCellWidth = this.times.steps[dayIndex].width.px;
+      let formatNames = Object.keys(this.calendar.hour.format);
       for (let hours = 24; hours > 1; hours = Math.ceil(hours / 2)) {
         for (let formatName of formatNames) {
           if (
-            (this.root.state.options.calendar.hour.maxWidths[formatName] + additionalSpace) * hours <= fullCellWidth &&
+            (this.calendar.hour.maxWidths[formatName] + additionalSpace) * hours <= fullCellWidth &&
             hours > 1
           ) {
             return {
@@ -71,15 +73,15 @@ export default {
      *
      * @returns {object}
      */
-    howManyDaysFit() {
+    howManyDaysFit(day) {
       const stroke = 1;
       const additionalSpace = stroke + 2;
-      let fullWidth = this.root.state.options.width;
-      let formatNames = Object.keys(this.root.state.options.calendar.day.format);
-      for (let days = this.root.state.options.times.steps.length; days > 1; days = Math.ceil(days / 2)) {
+      let fullWidth = this.width;
+      let formatNames = Object.keys(day.format);
+      for (let days = this.times.steps.length; days > 1; days = Math.ceil(days / 2)) {
         for (let formatName of formatNames) {
           if (
-            (this.root.state.options.calendar.day.maxWidths[formatName] + additionalSpace) * days <= fullWidth &&
+            (day.maxWidths[formatName] + additionalSpace) * days <= fullWidth &&
             days > 1
           ) {
             return {
@@ -100,21 +102,15 @@ export default {
      *
      * @returns {object}
      */
-    howManyWeeksFit() {
+    howManyWeeksFit(week, firstTime, lastTime) {
         const stroke = 1;
         const additionalSpace = stroke + 2;
-        let fullWidth = this.root.state.options.width;
-        let formatNames = Object.keys(this.root.state.options.calendar.week.format);
-        let currentWeek = dayjs(this.root.state.options.times.firstTime);
-        let previousWeek = currentWeek.clone();
-        const lastTime = this.root.state.options.times.lastTime;
-        let weeksCount = this.root.weeksCount(
-          this.root.state.options.times.firstTime,
-          this.root.state.options.times.lastTime
-        );
+        let fullWidth = this.width;
+        let formatNames = Object.keys(week.format);
+        let weeksCount = this.root.weeksCount(firstTime,lastTime);
         if (weeksCount === 1) {
           for (let formatName of formatNames) {
-            if (this.root.state.options.calendar.week.maxWidths[formatName] + additionalSpace <= fullWidth) {
+            if (week.maxWidths[formatName] + additionalSpace <= fullWidth) {
               return {
                 count: 1,
                 type: formatName
@@ -125,7 +121,7 @@ export default {
         for (let weeks = weeksCount; weeks > 1; weeks = Math.ceil(weeks / 2)) {
           for (let formatName of formatNames) {
             if (
-              (this.root.state.options.calendar.week.maxWidths[formatName] + additionalSpace) * weeks <= fullWidth &&
+              (week.maxWidths[formatName] + additionalSpace) * weeks <= fullWidth &&
               weeks > 1
             ) {
               return {
@@ -146,21 +142,15 @@ export default {
      *
      * @returns {object}
      */
-    howManyMonthsFit() {
+    howManyMonthsFit(month, firstTime, lastTime) {
       const stroke = 1;
       const additionalSpace = stroke + 2;
-      let fullWidth = this.root.state.options.width;
-      let formatNames = Object.keys(this.root.state.options.calendar.month.format);
-      let currentMonth = dayjs(this.root.state.options.times.firstTime);
-      let previousMonth = currentMonth.clone();
-      const lastTime = this.root.state.options.times.lastTime;
-      let monthsCount = this.root.monthsCount(
-        this.root.state.options.times.firstTime,
-        this.root.state.options.times.lastTime
-      );
+      let fullWidth = this.width;
+      let formatNames = Object.keys(month.format);
+      let monthsCount = this.root.monthsCount(firstTime, lastTime);
       if (monthsCount === 1) {
         for (let formatName of formatNames) {
-          if (this.root.state.options.calendar.month.maxWidths[formatName] + additionalSpace <= fullWidth) {
+          if (month.maxWidths[formatName] + additionalSpace <= fullWidth) {
             return {
               count: 1,
               type: formatName
@@ -171,7 +161,7 @@ export default {
       for (let months = monthsCount; months > 1; months = Math.ceil(months / 2)) {
         for (let formatName of formatNames) {
           if (
-            (this.root.state.options.calendar.month.maxWidths[formatName] + additionalSpace) * months <= fullWidth &&
+            (month.maxWidths[formatName] + additionalSpace) * months <= fullWidth &&
             months > 1
           ) {
             return {
@@ -192,21 +182,15 @@ export default {
      *
      * @returns {object}
      */
-    howManyQuartersFit() {
+    howManyQuartersFit(quarter, firstTime, lastTime) {
       const stroke = 1;
       const additionalSpace = stroke + 2;
-      let fullWidth = this.root.state.options.width;
-      let formatNames = Object.keys(this.root.state.options.calendar.quarter.format);
-      let currentquarter = dayjs(this.root.state.options.times.firstTime);
-      let previousquarter = currentquarter.clone();
-      const lastTime = this.root.state.options.times.lastTime;
-      let quartersCount = this.root.quartersCount(
-        this.root.state.options.times.firstTime,
-        this.root.state.options.times.lastTime
-      );
+      let fullWidth = this.width;
+      let formatNames = Object.keys(quarter.format);
+      let quartersCount = this.root.quartersCount(firstTime, lastTime);
       if (quartersCount === 1) {
         for (let formatName of formatNames) {
-          if (this.root.state.options.calendar.quarter.maxWidths[formatName] + additionalSpace <= fullWidth) {
+          if (quarter.maxWidths[formatName] + additionalSpace <= fullWidth) {
             return {
               count: 1,
               type: formatName
@@ -217,7 +201,7 @@ export default {
       for (let quarters = quartersCount; quarters > 1; quarters = Math.ceil(quarters / 2)) {
         for (let formatName of formatNames) {
           if (
-            (this.root.state.options.calendar.quarter.maxWidths[formatName] + additionalSpace) * quarters <= fullWidth &&
+            (quarter.maxWidths[formatName] + additionalSpace) * quarters <= fullWidth &&
             quarters > 1
           ) {
             return {
@@ -238,21 +222,15 @@ export default {
      *
      * @returns {object}
      */
-    howManyYearsFit() {
+    howManyYearsFit(year, firstTime, lastTime) {
       const stroke = 1;
       const additionalSpace = stroke + 2;
-      let fullWidth = this.root.state.options.width;
-      let formatNames = Object.keys(this.root.state.options.calendar.year.format);
-      let currentYear = dayjs(this.root.state.options.times.firstTime);
-      let previousYear = currentYear.clone();
-      const lastTime = this.root.state.options.times.lastTime;
-      let yearsCount = this.root.yearsCount(
-        this.root.state.options.times.firstTime,
-        this.root.state.options.times.lastTime
-      );
+      let fullWidth = this.width;
+      let formatNames = Object.keys(year.format);
+      let yearsCount = this.root.yearsCount(firstTime, lastTime);
       if (yearsCount === 1) {
         for (let formatName of formatNames) {
-          if (this.root.state.options.calendar.year.maxWidths[formatName] + additionalSpace <= fullWidth) {
+          if (year.maxWidths[formatName] + additionalSpace <= fullWidth) {
             return {
               count: 1,
               type: formatName
@@ -263,11 +241,46 @@ export default {
       for (let years = yearsCount; years > 1; years = Math.ceil(years / 2)) {
         for (let formatName of formatNames) {
           if (
-            (this.root.state.options.calendar.year.maxWidths[formatName] + additionalSpace) * years <= fullWidth &&
+            (year.maxWidths[formatName] + additionalSpace) * years <= fullWidth &&
             years > 1
           ) {
             return {
               count: years,
+              type: formatName
+            };
+          }
+        }
+      }
+      return {
+        count: 0,
+        type: formatNames[0]
+      };
+    },
+
+    howManyDecadesFit(decade, firstTime, lastTime) {
+      const stroke = 1;
+      const additionalSpace = stroke + 2;
+      let fullWidth = this.width;
+      let formatNames = Object.keys(decade.format);
+      let decadesCount = this.root.decadesCount(firstTime, lastTime);
+      if (decadesCount === 1) {
+        for (let formatName of formatNames) {
+          if (decade.maxWidths[formatName] + additionalSpace <= fullWidth) {
+            return {
+              count: 1,
+              type: formatName
+            };
+          }
+        }
+      }
+      for (let decades = decadesCount; decades > 1; decades = Math.ceil(decades / 2)) {
+        for (let formatName of formatNames) {
+          if (
+            (decade.maxWidths[formatName] + additionalSpace) * decades <= fullWidth &&
+            decades > 1
+          ) {
+            return {
+              count: decades,
               type: formatName
             };
           }
@@ -286,11 +299,10 @@ export default {
      */
     generateHours() {
       let allHours = [];
-      if (!this.root.state.options.calendar.hour.display) {
+      if (!this.calendar.hour.display) {
         return allHours;
       }
-      const steps = this.root.state.options.times.steps;
-      const localeName = this.root.state.options.locale.name;
+      const steps = this.times.steps;
       for (let hourIndex = 0, len = steps.length; hourIndex < len; hourIndex++) {
         const hoursCount = this.howManyHoursFit(hourIndex);
         if (hoursCount.count === 0) {
@@ -306,19 +318,19 @@ export default {
             index = hourIndex - Math.floor(hourIndex / 24) * 24;
           }
           let textWidth = 0;
-          if (typeof this.root.state.options.calendar.hour.widths[index] !== 'undefined') {
-            textWidth = this.root.state.options.calendar.hour.widths[index][hoursCount.type];
+          if (typeof this.calendar.hour.widths[index] !== 'undefined') {
+            textWidth = this.calendar.hour.widths[index][hoursCount.type];
           }
           let x = steps[hourIndex].offset.px + hourWidthPx * i;
           hours.children.push({
             index: hourIndex,
             key: 'h' + i,
             x,
-            y: this.root.state.options.calendar.day.height + this.root.state.options.calendar.month.height,
+            y: this.calendar.day.height + this.calendar.month.height,
             width: hourWidthPx,
             textWidth,
-            height: this.root.state.options.calendar.hour.height,
-            label: this.root.state.options.calendar.hour.formatted[hoursCount.type][hour]
+            height: this.calendar.hour.height,
+            label: this.calendar.hour.formatted[hoursCount.type][hour]
           });
         }
         allHours.push(hours);
@@ -332,16 +344,17 @@ export default {
      * @returns {array}
      */
     generateDays() {
+      const day = this.calendar.day;
       let days = [];
-      if (!this.root.state.options.calendar.day.display) {
+      if (!day.display) {
         return days;
       }
-      const daysCount = this.howManyDaysFit();
+      const daysCount = this.howManyDaysFit(day);
       if (daysCount.count === 0) {
         return days;
       }
-      const steps = this.root.state.options.times.steps;
-      const localeName = this.root.state.options.locale.name;
+      const steps = this.times.steps;
+      const localeName = this.locale.name;
       const dayStep = Math.ceil(steps.length / daysCount.count);
       for (let dayIndex = 0, len = steps.length; dayIndex < len; dayIndex += dayStep) {
         let dayWidthPx = 0;
@@ -353,19 +366,19 @@ export default {
         }
         const date = dayjs(steps[dayIndex].time);
         let textWidth = 0;
-        if (typeof this.root.state.options.calendar.day.widths[dayIndex] !== 'undefined') {
-          textWidth = this.root.state.options.calendar.day.widths[dayIndex][daysCount.type];
+        if (typeof day.widths[dayIndex] !== 'undefined') {
+          textWidth = day.widths[dayIndex][daysCount.type];
         }
         let x = steps[dayIndex].offset.px;
-        const label = this.root.state.options.calendar.day.format[daysCount.type](date.locale(localeName));
+        const label = day.format[daysCount.type](date.locale(localeName));
         days.push({
           index: dayIndex,
           key: steps[dayIndex].time + 'd',
           x,
-          y: this.root.state.options.calendar.month.height,
+          y: this.calendar.month.height,
           width: dayWidthPx,
           textWidth,
-          height: this.root.state.options.calendar.day.height,
+          height: day.height,
           label
         });
       }
@@ -380,31 +393,32 @@ export default {
      *
      * @returns {array}
      */
-    generateWeeks() {
+    generateWeeks(firstTime, lastTime) {
       let weeks = [];
-      if (!this.root.state.options.calendar.week.display) {
+      const week = this.calendar.week;
+      if (!week.display) {
         return weeks;
       }
-      const weeksCount = this.howManyWeeksFit();
+      const weeksCount = this.howManyWeeksFit(week, firstTime, lastTime);
       if (weeksCount.count === 0) {
         return weeks;
       }
-      const steps = this.root.state.options.times.steps;
-      const localeName = this.root.state.options.locale.name;
-      let formatNames = Object.keys(this.root.state.options.calendar.week.format);
-      let currentDate = dayjs(this.root.state.options.times.firstTime);
+      const steps = this.times.steps;
+      const localeName = this.locale.name;
+      let formatNames = Object.keys(week.format);
+      let currentDate = dayjs(firstTime);
       for (let weekIndex = 0; weekIndex < weeksCount.count; weekIndex++) {
         let weekWidth = 0;
         let weekOffset = Number.MAX_SAFE_INTEGER;
         let finalDate = dayjs(currentDate)
           .add(1, 'week')
           .startOf('week');
-        if (finalDate.valueOf() > this.root.state.options.times.lastTime) {
-          finalDate = dayjs(this.root.state.options.times.lastTime);
+        if (finalDate.valueOf() > lastTime) {
+          finalDate = dayjs(lastTime);
         }
         // we must find first and last step to get the offsets / widths
-        for (let step = 0, len = this.root.state.options.times.steps.length; step < len; step++) {
-          let currentStep = this.root.state.options.times.steps[step];
+        for (let step = 0, len = steps.length; step < len; step++) {
+          let currentStep = steps[step];
           if (currentStep.time >= currentDate.valueOf() && currentStep.time < finalDate.valueOf()) {
             weekWidth += currentStep.width.px;
             if (currentStep.offset.px < weekOffset) {
@@ -415,16 +429,16 @@ export default {
         let label = '';
         let choosenFormatName;
         for (let formatName of formatNames) {
-          if (this.root.state.options.calendar.week.maxWidths[formatName] + 2 <= weekWidth) {
-            const formatFunction = this.root.state.options.calendar.week.format[formatName];
+          if (week.maxWidths[formatName] + 2 <= weekWidth) {
+            const formatFunction = week.format[formatName];
             const dateLocal = currentDate.locale(localeName);
             label = formatFunction(dateLocal);
             choosenFormatName = formatName;
           }
         }
         let textWidth = 0;
-        if (typeof this.root.state.options.calendar.week.widths[weekIndex] !== 'undefined') {
-          textWidth = this.root.state.options.calendar.week.widths[weekIndex][choosenFormatName];
+        if (typeof week.widths[weekIndex] !== 'undefined') {
+          textWidth = week.widths[weekIndex][choosenFormatName];
         }
         let x = weekOffset;
         weeks.push({
@@ -435,12 +449,12 @@ export default {
           width: weekWidth,
           textWidth,
           choosenFormatName,
-          height: this.root.state.options.calendar.week.height,
+          height: week.height,
           label
         });
         currentDate = currentDate.add(1, 'week').startOf('week');
-        if (currentDate.valueOf() > this.root.state.options.times.lastTime) {
-          currentDate = dayjs(this.root.state.options.times.lastTime);
+        if (currentDate.valueOf() > lastTime) {
+          currentDate = dayjs(lastTime);
         }
       }
       return weeks.map(item => ({
@@ -454,31 +468,32 @@ export default {
      *
      * @returns {array}
      */
-    generateMonths() {
+    generateMonths(firstTime, lastTime) {
       let months = [];
-      if (!this.root.state.options.calendar.month.display) {
+      const month = this.calendar.month;
+      if (!month.display) {
         return months;
       }
-      const monthsCount = this.howManyMonthsFit();
+      const monthsCount = this.howManyMonthsFit(month, firstTime, lastTime);
       if (monthsCount.count === 0) {
         return months;
       }
-      const steps = this.root.state.options.times.steps;
-      const localeName = this.root.state.options.locale.name;
-      let formatNames = Object.keys(this.root.state.options.calendar.month.format);
-      let currentDate = dayjs(this.root.state.options.times.firstTime);
+      const steps = this.times.steps;
+      const localeName = this.locale.name;
+      let formatNames = Object.keys(month.format);
+      let currentDate = dayjs(firstTime);
       for (let monthIndex = 0; monthIndex < monthsCount.count; monthIndex++) {
         let monthWidth = 0;
         let monthOffset = Number.MAX_SAFE_INTEGER;
         let finalDate = dayjs(currentDate)
           .add(1, 'month')
           .startOf('month');
-        if (finalDate.valueOf() > this.root.state.options.times.lastTime) {
-          finalDate = dayjs(this.root.state.options.times.lastTime);
+        if (finalDate.valueOf() > lastTime) {
+          finalDate = dayjs(lastTime);
         }
         // we must find first and last step to get the offsets / widths
-        for (let step = 0, len = this.root.state.options.times.steps.length; step < len; step++) {
-          let currentStep = this.root.state.options.times.steps[step];
+        for (let step = 0, len = steps.length; step < len; step++) {
+          let currentStep = steps[step];
           if (currentStep.time >= currentDate.valueOf() && currentStep.time < finalDate.valueOf()) {
             monthWidth += currentStep.width.px;
             if (currentStep.offset.px < monthOffset) {
@@ -489,14 +504,14 @@ export default {
         let label = '';
         let choosenFormatName;
         for (let formatName of formatNames) {
-          if (this.root.state.options.calendar.month.maxWidths[formatName] + 2 <= monthWidth) {
-            label = this.root.state.options.calendar.month.format[formatName](currentDate.locale(localeName));
+          if (month.maxWidths[formatName] + 2 <= monthWidth) {
+            label = month.format[formatName](currentDate.locale(localeName));
             choosenFormatName = formatName;
           }
         }
         let textWidth = 0;
-        if (typeof this.root.state.options.calendar.month.widths[monthIndex] !== 'undefined') {
-          textWidth = this.root.state.options.calendar.month.widths[monthIndex][choosenFormatName];
+        if (typeof month.widths[monthIndex] !== 'undefined') {
+          textWidth = month.widths[monthIndex][choosenFormatName];
         }
         let x = monthOffset;
         months.push({
@@ -507,12 +522,12 @@ export default {
           width: monthWidth,
           textWidth,
           choosenFormatName,
-          height: this.root.state.options.calendar.month.height,
+          height: month.height,
           label
         });
         currentDate = currentDate.add(1, 'month').startOf('month');
-        if (currentDate.valueOf() > this.root.state.options.times.lastTime) {
-          currentDate = dayjs(this.root.state.options.times.lastTime);
+        if (currentDate.valueOf() > lastTime) {
+          currentDate = dayjs(lastTime);
         }
       }
       return months.map(item => ({
@@ -526,31 +541,32 @@ export default {
      *
      * @returns {array}
      */
-    generateQuarters() {
+    generateQuarters(firstTime, lastTime) {
       let quarters = [];
-      if (!this.root.state.options.calendar.quarter.display) {
+      const quarter = this.calendar.quarter;
+      if (!quarter.display) {
         return quarters;
       }
-      const quartersCount = this.howManyQuartersFit();
+      const quartersCount = this.howManyQuartersFit(quarter, firstTime, lastTime);
       if (quartersCount.count === 0) {
         return quarters;
       }
-      const steps = this.root.state.options.times.steps;
-      const localeName = this.root.state.options.locale.name;
-      let formatNames = Object.keys(this.root.state.options.calendar.quarter.format);
-      let currentDate = dayjs(this.root.state.options.times.firstTime);
+      const steps = this.times.steps;
+      const localeName = this.locale.name;
+      let formatNames = Object.keys(quarter.format);
+      let currentDate = dayjs(firstTime);
       for (let quarterIndex = 0; quarterIndex < quartersCount.count; quarterIndex++) {
         let quarterWidth = 0;
         let quarterOffset = Number.MAX_SAFE_INTEGER;
         let finalDate = dayjs(currentDate)
           .add(1, 'quarter')
           .startOf('quarter');
-        if (finalDate.valueOf() > this.root.state.options.times.lastTime) {
-          finalDate = dayjs(this.root.state.options.times.lastTime);
+        if (finalDate.valueOf() > lastTime) {
+          finalDate = dayjs(lastTime);
         }
         // we must find first and last step to get the offsets / widths
-        for (let step = 0, len = this.root.state.options.times.steps.length; step < len; step++) {
-          let currentStep = this.root.state.options.times.steps[step];
+        for (let step = 0, len = steps.length; step < len; step++) {
+          let currentStep = steps[step];
           if (currentStep.time >= currentDate.valueOf() && currentStep.time < finalDate.valueOf()) {
             quarterWidth += currentStep.width.px;
             if (currentStep.offset.px < quarterOffset) {
@@ -561,16 +577,16 @@ export default {
         let label = '';
         let choosenFormatName;
         for (let formatName of formatNames) {
-          if (this.root.state.options.calendar.quarter.maxWidths[formatName] + 2 <= quarterWidth) {
-            const format = this.root.state.options.calendar.quarter.format[formatName];
+          if (quarter.maxWidths[formatName] + 2 <= quarterWidth) {
+            const format = quarter.format[formatName];
             const day = currentDate.locale(localeName);
             label = format(day);
             choosenFormatName = formatName;
           }
         }
         let textWidth = 0;
-        if (typeof this.root.state.options.calendar.quarter.widths[quarterIndex] !== 'undefined') {
-          textWidth = this.root.state.options.calendar.quarter.widths[quarterIndex][choosenFormatName];
+        if (typeof quarter.widths[quarterIndex] !== 'undefined') {
+          textWidth = quarter.widths[quarterIndex][choosenFormatName];
         }
         let x = quarterOffset;
         quarters.push({
@@ -581,12 +597,12 @@ export default {
           width: quarterWidth,
           textWidth,
           choosenFormatName,
-          height: this.root.state.options.calendar.quarter.height,
+          height: quarter.height,
           label
         });
         currentDate = currentDate.add(1, 'quarter').startOf('quarter');
-        if (currentDate.valueOf() > this.root.state.options.times.lastTime) {
-          currentDate = dayjs(this.root.state.options.times.lastTime);
+        if (currentDate.valueOf() > lastTime) {
+          currentDate = dayjs(lastTime);
         }
       }
       return quarters.map(item => ({
@@ -600,31 +616,32 @@ export default {
      *
      * @returns {array}
      */
-    generateYears() {
+    generateYears(firstTime, lastTime) {
       let years = [];
-      if (!this.root.state.options.calendar.year.display) {
+      const year = this.calendar.year;
+      if (!year.display) {
         return years;
       }
-      const yearsCount = this.howManyYearsFit();
+      const yearsCount = this.howManyYearsFit(year, firstTime, lastTime);
       if (yearsCount.count === 0) {
         return years;
       }
-      const steps = this.root.state.options.times.steps;
-      const localeName = this.root.state.options.locale.name;
-      let formatNames = Object.keys(this.root.state.options.calendar.year.format);
-      let currentDate = dayjs(this.root.state.options.times.firstTime);
+      const steps = this.times.steps;
+      const localeName = this.locale.name;
+      let formatNames = Object.keys(year.format);
+      let currentDate = dayjs(firstTime);
       for (let yearIndex = 0; yearIndex < yearsCount.count; yearIndex++) {
         let yearWidth = 0;
         let yearOffset = Number.MAX_SAFE_INTEGER;
         let finalDate = dayjs(currentDate)
           .add(1, 'year')
           .startOf('year');
-        if (finalDate.valueOf() > this.root.state.options.times.lastTime) {
-          finalDate = dayjs(this.root.state.options.times.lastTime);
+        if (finalDate.valueOf() > lastTime) {
+          finalDate = dayjs(lastTime);
         }
         // we must find first and last step to get the offsets / widths
-        for (let step = 0, len = this.root.state.options.times.steps.length; step < len; step++) {
-          let currentStep = this.root.state.options.times.steps[step];
+        for (let step = 0, len = steps.length; step < len; step++) {
+          let currentStep = steps[step];
           if (currentStep.time >= currentDate.valueOf() && currentStep.time < finalDate.valueOf()) {
             yearWidth += currentStep.width.px;
             if (currentStep.offset.px < yearOffset) {
@@ -635,14 +652,14 @@ export default {
         let label = '';
         let choosenFormatName;
         for (let formatName of formatNames) {
-          if (this.root.state.options.calendar.year.maxWidths[formatName] + 2 <= yearWidth) {
-            label = this.root.state.options.calendar.year.format[formatName](currentDate.locale(localeName));
+          if (year.maxWidths[formatName] + 2 <= yearWidth) {
+            label = year.format[formatName](currentDate.locale(localeName));
             choosenFormatName = formatName;
           }
         }
         let textWidth = 0;
-        if (typeof this.root.state.options.calendar.year.widths[yearIndex] !== 'undefined') {
-          textWidth = this.root.state.options.calendar.year.widths[yearIndex][choosenFormatName];
+        if (typeof year.widths[yearIndex] !== 'undefined') {
+          textWidth = year.widths[yearIndex][choosenFormatName];
         }
         let x = yearOffset;
         years.push({
@@ -653,12 +670,12 @@ export default {
           width: yearWidth,
           textWidth,
           choosenFormatName,
-          height: this.root.state.options.calendar.year.height,
+          height: year.height,
           label
         });
         currentDate = currentDate.add(1, 'year').startOf('year');
-        if (currentDate.valueOf() > this.root.state.options.times.lastTime) {
-          currentDate = dayjs(this.root.state.options.times.lastTime);
+        if (currentDate.valueOf() > lastTime) {
+          currentDate = dayjs(lastTime);
         }
       }
       return years.map(item => ({
@@ -667,47 +684,123 @@ export default {
       }));
     },
 
+    generateDecade(firstTime, lastTime) {
+      let decades = [];
+      const decade = this.calendar.decade;
+      if (!decade.display) {
+        return decades;
+      }
+      const decadesCount = this.howManyDecadesFit(decade, firstTime, lastTime);
+      if (decadesCount.count === 0) {
+        return decades;
+      }
+      const steps = this.times.steps;
+      const localeName = this.locale.name;
+      let formatNames = Object.keys(decade.format);
+      let currentDate = dayjs(firstTime);
+      for (let decadeIndex = 0; decadeIndex < decadesCount.count; decadeIndex++) {
+        let decadeWidth = 0;
+        let decadeOffset = Number.MAX_SAFE_INTEGER;
+        let finalDate = __addDecade(dayjs(currentDate))
+        if (finalDate.valueOf() > lastTime) {
+          finalDate = dayjs(lastTime);
+        }
+        for (let step = 0, len = steps.length; step < len; step++) {
+          let currentStep = steps[step];
+          if (currentStep.time >= currentDate.valueOf() && currentStep.time < finalDate.valueOf()) {
+            decadeWidth += currentStep.width.px;
+            if (currentStep.offset.px < decadeOffset) {
+              decadeOffset = currentStep.offset.px;
+            }
+          }
+        }
+        let label = '';
+        let choosenFormatName;
+        for (let formatName of formatNames) {
+          if (decade.maxWidths[formatName] + 2 <= decadeWidth) {
+            label = decade.format[formatName](currentDate.locale(localeName));
+            label = label + ' - ' + decade.format[formatName](finalDate.subtract(1, 'year').locale(localeName));
+            choosenFormatName = formatName;
+          }
+        }
+        let textWidth = 0;
+        if (typeof decade.widths[decadeIndex] !== 'undefined') {
+          textWidth = decade.widths[decadeIndex][choosenFormatName];
+        }
+        let x = decadeOffset;
+        decades.push({
+          index: decadeIndex,
+          key: decadeIndex + 'm',
+          x,
+          y: 0,
+          width: decadeWidth,
+          textWidth,
+          choosenFormatName,
+          height: decade.height,
+          label
+        });
+        currentDate = __addDecade(currentDate);
+        if (currentDate.valueOf() > lastTime) {
+          currentDate = dayjs(lastTime);
+        }
+      }
+      return decades.map(item => ({
+        key: item.key,
+        children: [item]
+      }));
+    },
+    
+    __addDecade(currentDate) {
+      return currentDate.add(10, 'year').startOf('year');
+    },
+
     /**
      * Sum all calendar rows height and return result
      *
      * @returns {int}
      */
-    calculateCalendarDimensions({ hours, days, weeks, months, quarters, years }) {
+    calculateCalendarDimensions({ hours, days, weeks, months, quarters, years, decades }) {
       let height = 0;
-      if (this.root.state.options.calendar.hour.display && hours.length > 0) {
-        height += this.root.state.options.calendar.hour.height;
+      if (this.calendar.hour.display && hours.length > 0) {
+        height += this.calendar.hour.height;
       }
-      if (this.root.state.options.calendar.day.display && days.length > 0) {
-        height += this.root.state.options.calendar.day.height;
+      if (this.calendar.day.display && days.length > 0) {
+        height += this.calendar.day.height;
       }
-      if (this.root.state.options.calendar.week.display && weeks.length > 0) {
-        height += this.root.state.options.calendar.week.height;
+      if (this.calendar.week.display && weeks.length > 0) {
+        height += this.calendar.week.height;
       }
-      if (this.root.state.options.calendar.month.display && months.length > 0) {
-        height += this.root.state.options.calendar.month.height;
+      if (this.calendar.month.display && months.length > 0) {
+        height += this.calendar.month.height;
       }
-      if (this.root.state.options.calendar.quarter.display && quarters.length > 0) {
-        height += this.root.state.options.calendar.quarter.height;
+      if (this.calendar.quarter.display && quarters.length > 0) {
+        height += this.calendar.quarter.height;
       }
-      if (this.root.state.options.calendar.year.display && years.length > 0) {
-        height += this.root.state.options.calendar.year.height;
+      if (this.calendar.year.display && years.length > 0) {
+        height += this.calendar.year.height;
+      }
+      if (this.calendar.decade.display && decades.length > 0) {
+        height += this.calendar.decade.height;
       }
       if (height === 0) {
-        height += this.root.state.options.calendar.defaultHeight;
+        height += this.calendar.defaultHeight;
       }
-      this.root.state.options.calendar.height = height;
+      this.calendar.height = height;
     }
   },
 
   computed: {
     dates() {
+      const firstTime = this.times.firstTime;
+      const lastTime = this.times.lastTime;
       const hours = this.generateHours();
       const days = this.generateDays();
-      const weeks = this.generateWeeks();
-      const months = this.generateMonths();
-      const quarters = this.generateQuarters();
-      const years = this.generateYears();
-      const allDates = { hours, days, weeks, months, quarters, years };
+      const weeks = this.generateWeeks(firstTime, lastTime);
+      const months = this.generateMonths(firstTime, lastTime);
+      const quarters = this.generateQuarters(firstTime, lastTime);
+      const years = this.generateYears(firstTime, lastTime);
+      const decades = this.generateDecade(firstTime, lastTime);
+      const allDates = { hours, days, weeks, months, quarters, years, decades };
       this.calculateCalendarDimensions(allDates);
       return allDates;
     }

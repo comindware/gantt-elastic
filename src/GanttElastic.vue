@@ -222,7 +222,7 @@ function getOptions(userOptions) {
             return date.format('DD ddd');
           },
           short(date) {
-            return date.format('DD');
+            return date.format('dd');
           }
         }
       },
@@ -230,10 +230,14 @@ function getOptions(userOptions) {
         height: 20, //*
         display: true, //*
         widths: [],
-        maxWidths: { long: 0 },
+        maxWidths: { long: 40, medium: 0 },
         format: {
+          medium(date) {
+            return date.week();
+          },
           long(date) {
             return date.format('wo');
+            
           }
         }
       },
@@ -241,17 +245,17 @@ function getOptions(userOptions) {
         height: 20, //*
         display: true, //*
         widths: [],
-        maxWidths: { short: 0, medium: 0, long: 0 },
+        maxWidths: { short: 60, medium: 60, long: 60 },
         format: {
           //*
           short(date) {
-            return date.format('MM');
+            return date.format("MM");
           },
           medium(date) {
-            return date.format("MMM");
+            return date.format("MMMM");
           },
           long(date) {
-            return date.format('MMMM');
+            return date.format('MMMM-YYYY');
           }
         }
       },
@@ -270,6 +274,17 @@ function getOptions(userOptions) {
         }
       },
       year: {
+        height: 20,
+        display: true,
+        widths: [],
+        maxWidths: { long: 0 },
+        format: {
+          long(date) {
+            return date.format('YYYY');
+          }
+        }
+      },
+      decade: {
         height: 20,
         display: true,
         widths: [],
@@ -556,6 +571,7 @@ const GanttElastic = {
       }
     };
   },
+
   methods: {
     mergeDeep,
     mergeDeepReactive,
@@ -1214,14 +1230,21 @@ const GanttElastic = {
       let percent = this.state.options.times.timeZoom / 100;
       this.state.options.times.timePerPixel =
         this.state.options.times.timeScale * steps * percent + Math.pow(2, this.state.options.times.timeZoom);
-      this.state.options.times.totalViewDurationMs = dayjs(this.state.options.times.lastTime).diff(
-        this.state.options.times.firstTime,
-        'milliseconds'
-      );
-      this.state.options.times.totalViewDurationPx =
-        this.state.options.times.totalViewDurationMs / this.state.options.times.timePerPixel;
-      this.state.options.width =
-        this.state.options.times.totalViewDurationPx + this.style['grid-line-vertical']['stroke-width'];
+      const calendarWidth = this.state.options.clientWidth - this.state.options.taskList.finalWidth;
+      do {
+        this.state.options.times.totalViewDurationMs = dayjs(this.state.options.times.lastTime).diff(
+          this.state.options.times.firstTime,
+          'milliseconds'
+        );
+        this.state.options.times.totalViewDurationPx =
+          this.state.options.times.totalViewDurationMs / this.state.options.times.timePerPixel;
+        this.state.options.width =
+          this.state.options.times.totalViewDurationPx + this.style['grid-line-vertical']['stroke-width'];
+        if (calendarWidth > this.state.options.width) {
+          const width = (calendarWidth - this.state.options.width) * this.state.options.times.timePerPixel;
+          this.state.options.times.lastTime = dayjs(this.state.options.times.lastTime).add(width, 'milliseconds').endOf('day').valueOf();
+      }
+      } while (calendarWidth > this.state.options.width)
     },
 
     /**
@@ -1471,6 +1494,22 @@ const GanttElastic = {
       return yearCount;
     },
 
+    decadesCount(fromTime, toTime) {
+      if (fromTime > toTime) {
+        return 0;
+      }
+      let currentDecade = dayjs(fromTime);
+      let previousDecade = currentDecade.clone();
+      let decadeCount = 1;
+      while (currentDecade.valueOf() <= toTime) {
+        currentDecade = currentDecade.add(1, 'day');
+        if (previousDecade.year() !== currentDecade.year()) {
+          decadeCount++;
+        }
+        previousDecade = currentDecade.clone();
+      }
+      return Math.ceil(decadeCount / 10);
+    },
     /**
      * Compute month calendar columns widths basing on text widths
      */
@@ -1582,6 +1621,14 @@ const GanttElastic = {
       this.calculateTaskListColumnsDimensions();
       this.$emit('calendar-recalculate');
       this.syncScrollTop();
+      this.resizeScale();
+    },
+
+    resizeScale() {
+      this.initTimes();
+      this.calculateSteps();
+      this.computeCalendarWidths();
+      this.fixScrollPos();
     }
   },
 
