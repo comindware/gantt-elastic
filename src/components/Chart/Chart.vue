@@ -17,7 +17,13 @@
         'margin-bottom': root.state.options.calendar.gap + 'px'
       }"
     >
-      <calendar></calendar>
+      <calendar 
+        :calendar="root.state.options.calendar" 
+        :times="root.state.options.times" 
+        :width="root.state.options.width" 
+        :locale="root.state.options.locale"
+      >
+      </calendar>
     </div>
     <div
       class="gantt-elastic__chart-graph-container"
@@ -30,18 +36,19 @@
       <div
         :style="{
           ...root.style['chart-area'],
-          width: '100%',
+          width: this.root.state.options.width + 'px',
+          'min-width': '100%',
           height: root.state.options.rowsHeight + 'px'
         }"
       >
         <div
           class="gantt-elastic__chart-graph"
           ref="chartGraph"
-          :style="{ ...root.style['chart-graph'], height: '100%', width: '100%' }"
+          :style="{ ...root.style['chart-graph'], height: '100%', 'min-width': '100%'}"
         >
           <svg
             class="gantt-elastic__chart-graph-svg"
-            :style="{ ...root.style['chart-graph-svg'], width: '100%'}"
+            :style="{ ...root.style['chart-graph-svg'], 'min-width': '100%'}"
             ref="chartGraphSvg"
             x="0"
             y="0"

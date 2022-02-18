@@ -29,10 +29,10 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     },
     'calendar-wrapper': {
       'user-select': 'none',
-      width: '100%'
+      'min-width': '100%'
     },
     calendar: {
-      width: '100%',
+      'min-width': '100%',
       background: '#f3f5f7',
       display: 'block'
     },

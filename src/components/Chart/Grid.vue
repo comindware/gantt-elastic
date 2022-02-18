@@ -9,10 +9,12 @@
 <template>
   <svg
     class="gantt-elastic__grid-lines-wrapper"
-    :style="{ ...root.style['grid-lines-wrapper'], width: '100%'}"
+    :style="{ ...root.style['grid-lines-wrapper']}"
     ref="chart"
     x="0"
     y="0"
+    min-width='100%'
+    :width="this.root.state.options.width"
     :height="root.state.options.allVisibleTasksHeight"
     xmlns="http://www.w3.org/2000/svg"
   >
