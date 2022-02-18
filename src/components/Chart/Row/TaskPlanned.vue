@@ -17,13 +17,13 @@
   >
     <svg
       class="gantt-elastic__chart-row-bar gantt-elastic__chart-row-task"
-      :style="{ ...root.style['chart-row-bar'], ...root.style['chart-row-task'], ...task.style['chart-row-bar'] }"
+      :style="{ ...root.style['chart-row-bar'], ...root.style['chart-row-task'], ...task.style['chart-row-bar'], ...task.style['chart-row-bar-planned'] }"
       :x="task.xP"
       :y="task.yP"
       :width="task.widthP"
       :height="task.height"
       :viewBox="`0 0 ${task.widthP} ${task.height}`"
-      @click="emitEvent('click', $event)"
+      @click="onBarClick($event)"
       @mouseenter="emitEvent('mouseenter', $event)"
       @mouseover="emitEvent('mouseover', $event)"
       @mouseout="emitEvent('mouseout', $event)"
@@ -77,5 +77,14 @@ export default {
       return 'gantt-elastic__task-clip-path-' + this.task.id;
     },
   },
+  methods: {
+    onBarClick(event) {
+      const callBacks = this.root.state.options.callBacks;
+      if (callBacks && callBacks.onTaskClick) {
+         callBacks.onTaskClick(event.target, this.task.id);
+      }
+      this.$emit('click', event);
+    }
+  }
 };
 </script>

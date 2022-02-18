@@ -330,7 +330,8 @@ function getOptions(userOptions) {
         });
       }
     },
-    meta: {}
+    meta: {},
+    callBacks: {}
   };
 }
 
