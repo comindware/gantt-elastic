@@ -17,7 +17,7 @@
   >
     <svg
       class="gantt-elastic__chart-row-bar gantt-elastic__chart-row-task"
-      :style="{ ...root.style['chart-row-bar'], ...root.style['chart-row-task'], ...task.style['chart-row-bar'], ...task.style['chart-row-bar-planned'] }"
+      :style="{ ...root.style['chart-row-bar'], ...root.style['chart-row-task'], ...task.style['chart-row-bar'] }"
       :x="task.xP"
       :y="task.yP"
       :width="task.widthP"
@@ -35,6 +35,7 @@
       @touchmove="emitEvent('touchmove', $event)"
       @touchend="emitEvent('touchend', $event)"
       xmlns="http://www.w3.org/2000/svg"
+      ref="taskBar"
     >
       <rect
         class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-bar-polygon-estimated"
@@ -76,15 +77,6 @@ export default {
     clipPathId() {
       return 'gantt-elastic__task-clip-path-' + this.task.id;
     },
-  },
-  methods: {
-    onBarClick(event) {
-      const callBacks = this.root.state.options.callBacks;
-      if (callBacks && callBacks.onTaskClick) {
-         callBacks.onTaskClick(event.target, this.task.id);
-      }
-      this.$emit('click', event);
-    }
   }
 };
 </script>

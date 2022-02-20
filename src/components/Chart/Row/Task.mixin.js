@@ -47,6 +47,18 @@ export default {
       if (!this.root.state.options.scroll.scrolling) {
         this.root.$emit(`chart-${this.task.type}-${eventName}`, { event, data: this.task });
       }
+    },
+    /**
+     * Handler for click event
+     *
+     * @param {Event} event
+     */
+    onBarClick(event) {
+      const callBacks = this.root.state.options.callBacks;
+      if (callBacks && callBacks.onTaskClick) {
+        callBacks.onTaskClick(this.$refs.taskBar, { id: this.task.id, title: this.task.title });
+      }
+      this.emitEvent('click', event);
     }
   }
 };

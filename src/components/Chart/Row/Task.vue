@@ -38,7 +38,7 @@
       :width="task.width"
       :height="task.height"
       :viewBox="`0 0 ${task.width} ${task.height}`"
-      @click="emitEvent('click', $event)"
+      @click="onBarClick($event)"
       @mouseenter="emitEvent('mouseenter', $event)"
       @mouseover="emitEvent('mouseover', $event)"
       @mouseout="emitEvent('mouseout', $event)"
@@ -50,6 +50,7 @@
       @touchmove="emitEvent('touchmove', $event)"
       @touchend="emitEvent('touchend', $event)"
       xmlns="http://www.w3.org/2000/svg"
+      ref="taskBar"
     >
       <defs>
         <clipPath :id="clipPathId">
@@ -92,6 +93,7 @@
         class="gantt-elastic__chart-row-title-wrapper"
         :task="task"
         :style="{ ...task.style['chart-row-title-wrapper'] }"
+        @click="onBarClick($event)"
       >
         <div
           class="gantt-elastic__chart-row-title-text"
