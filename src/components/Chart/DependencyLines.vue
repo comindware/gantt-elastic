@@ -130,14 +130,12 @@ export default {
       }
       return points;
     },
-    onDependencyLineClick(event, dependencyLine){
-      if (this.root.state.refs.dependencyPopupEl) {
-        this.root.state.popupData = {
-          taskId: dependencyLine.taskId,
-          prevTaskId: dependencyLine.prevTaskId,
-          dependencyLineEl: event.target
-        };
-      }
+    onDependencyLineClick(event, dependencyLine) {
+      this.root.state.popupData = {
+        taskId: dependencyLine.taskId,
+        prevTaskId: dependencyLine.prevTaskId,
+        dependencyLineEl: event.target
+      };
     }
   },
   computed: {

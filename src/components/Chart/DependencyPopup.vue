@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="info"
+    v-show="info"
     class="gantt-elastic__chart-tasks-dependency-popup"
     :style="{
       ...this.styles,
@@ -34,7 +34,7 @@
       :style="{
         ...root.style['dependency-popup-info-container'],
       }"
-      v-if="info.viewData"
+      v-if="info && info.viewData"
     >
       <div
         class="gantt-elastic__chart-tasks-dependency-popup-info-row"
@@ -75,6 +75,12 @@ export default {
     return {
       styles: {},
     };
+  },
+  /**
+   * Mounted
+   */
+  mounted() {
+    this.root.state.refs.dependencyPopupEl = this.$refs.dependencyPopupEl;
   },
   computed: {
     /**
@@ -129,7 +135,7 @@ export default {
         return;
       }
       const popupWidth = this.root.state.options.dependencyPopup.width;
-      const depLineRect = this.info.dependencyLineEl.getClientRects()[0];
+      const depLineRect = this.info.dependencyLineEl.getBoundingClientRect();
       const left = depLineRect.left + depLineRect.width / 2 - popupWidth / 2 + 'px';
       const top = depLineRect.bottom + TOP_OFFSET + 'px';
 

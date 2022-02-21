@@ -56,7 +56,7 @@ export default {
     onBarClick(event) {
       const callBacks = this.root.state.options.callBacks;
       if (callBacks && callBacks.onTaskClick) {
-        callBacks.onTaskClick(this.$refs.taskBar, { id: this.task.id, title: this.task.title });
+        callBacks.onTaskClick({ taskEl: this.$refs.taskBar, taskData: { id: this.task.id, title: this.task.title } });
       }
       this.emitEvent('click', event);
     }

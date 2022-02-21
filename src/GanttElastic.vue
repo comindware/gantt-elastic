@@ -1185,7 +1185,7 @@ const GanttElastic = {
      */
     onClick(event) {
       const popup = this.state.refs.dependencyPopupEl;
-      if (popup && (event.target !== popup || !popup.contains(event.target))) {
+      if (popup && !popup.contains(event.target)) {
         this.state.popupData = {
           taskId: '',
           prevTaskId: ''
