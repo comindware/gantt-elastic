@@ -69,7 +69,7 @@
               <component :task="task" v-if="root.state.options.showExpected" :is="task.type"></component>
             </g>
           </svg>
-          <dependency-popup ref="chartDependencyPopup"></dependency-popup>
+          <dependency-popup></dependency-popup>
         </div>
       </div>
     </div>
@@ -113,7 +113,6 @@ export default {
     this.root.state.refs.chartCalendarContainer = this.$refs.chartCalendarContainer;
     this.root.state.refs.chartGraphContainer = this.$refs.chartGraphContainer;
     this.root.state.refs.chartGraph = this.$refs.chartGraph;
-    this.root.state.refs.chartDependencyPopup = this.$refs.chartDependencyPopup;
     this.root.state.refs.chartGraphSvg = this.$refs.chartGraphSvg;
   },
 

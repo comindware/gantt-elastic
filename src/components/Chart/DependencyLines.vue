@@ -34,7 +34,7 @@
         :key="dependencyLine.id"
         :task="task"
         :d="dependencyLine.points"
-        @click.stop="onDependencyLineClick(dependencyLine)"
+        @click.stop="onDependencyLineClick($event, dependencyLine)"
         marker-end="url(#gantt-elastic__chart-dependency-lines-marker)"
       ></path>
     </g>
@@ -130,13 +130,12 @@ export default {
       }
       return points;
     },
-    onDependencyLineClick(dependencyLine){
-      if (this.root.state.refs.chartDependencyPopup) {
-        this.root.state.popupData = {
-          taskId: dependencyLine.taskId,
-          prevTaskId: dependencyLine.prevTaskId
-        };
-      }
+    onDependencyLineClick(event, dependencyLine) {
+      this.root.state.popupData = {
+        taskId: dependencyLine.taskId,
+        prevTaskId: dependencyLine.prevTaskId,
+        dependencyLineEl: event.target
+      };
     }
   },
   computed: {

@@ -345,7 +345,8 @@ function getOptions(userOptions) {
         });
       }
     },
-    meta: {}
+    meta: {},
+    callBacks: {}
   };
 }
 
@@ -552,7 +553,8 @@ const GanttElastic = {
         },
         popupData: {
           taskId: '',
-          prevTaskId: ''
+          prevTaskId: '',
+          dependencyLineEl: null
         },
         dynamicStyle: {},
         refs: {},
@@ -1197,8 +1199,9 @@ const GanttElastic = {
     /**
      * click event handler
      */
-    onClick() {
-      if (this.state.refs.chartDependencyPopup) {
+    onClick(event) {
+      const popup = this.state.refs.dependencyPopupEl;
+      if (popup && !popup.contains(event.target)) {
         this.state.popupData = {
           taskId: '',
           prevTaskId: ''
@@ -1218,6 +1221,7 @@ const GanttElastic = {
       this.$on('scope-change', this.onScopeChange);
       this.$on('taskList-width-change', this.onTaskListWidthChange);
       this.$on('taskList-column-width-change', this.onTaskListColumnWidthChange);
+      document.addEventListener('click', this.onClick);
     },
 
     /**
@@ -1828,6 +1832,7 @@ const GanttElastic = {
     this.state.unwatchOutputTasks();
     this.state.unwatchOutputOptions();
     this.state.unwatchOutputStyle();
+    document.removeEventListener('click', this.onClick);
     this.$emit('before-destroy');
   },
 

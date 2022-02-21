@@ -23,7 +23,7 @@
       :width="task.widthP"
       :height="task.height"
       :viewBox="`0 0 ${task.widthP} ${task.height}`"
-      @click="emitEvent('click', $event)"
+      @click="onBarClick($event)"
       @mouseenter="emitEvent('mouseenter', $event)"
       @mouseover="emitEvent('mouseover', $event)"
       @mouseout="emitEvent('mouseout', $event)"
@@ -35,6 +35,7 @@
       @touchmove="emitEvent('touchmove', $event)"
       @touchend="emitEvent('touchend', $event)"
       xmlns="http://www.w3.org/2000/svg"
+      ref="taskBar"
     >
       <rect
         class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-bar-polygon-estimated"
@@ -76,6 +77,6 @@ export default {
     clipPathId() {
       return 'gantt-elastic__task-clip-path-' + this.task.id;
     },
-  },
+  }
 };
 </script>

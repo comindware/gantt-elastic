@@ -1,12 +1,12 @@
 <template>
   <div
-    v-if="info"
+    v-show="info"
     class="gantt-elastic__chart-tasks-dependency-popup"
     :style="{
       ...this.styles,
     }"
     @click="(event) => event.stopPropagation()"
-    ref="popup"
+    ref="dependencyPopupEl"
   >
     <div
       class="gantt-elastic__chart-tasks-dependency-popup-arrow-up-block"
@@ -34,7 +34,7 @@
       :style="{
         ...root.style['dependency-popup-info-container'],
       }"
-      v-if="info.viewData"
+      v-if="info && info.viewData"
     >
       <div
         class="gantt-elastic__chart-tasks-dependency-popup-info-row"
@@ -66,26 +66,21 @@
 </template>
 
 <script>
+const TOP_OFFSET = 25;
+
 export default {
   name: 'DependencyPopup',
   inject: ['root'],
   data() {
     return {
-      position: {
-        top: 0,
-        left: 0,
-      },
       styles: {},
     };
   },
-  updated() {
-    const top = this.position.top;
-    if (top && this.$refs.popup) {
-      const bottom = top + this.$refs.popup.offsetHeight;
-      const chartHeight = this.root.state.refs.chartGraph.offsetHeight;
-      this.styles.top =
-        (chartHeight < bottom ? top - bottom + chartHeight - this.root.state.options.row.height / 4 : top) + 'px';
-    }
+  /**
+   * Mounted
+   */
+  mounted() {
+    this.root.state.refs.dependencyPopupEl = this.$refs.dependencyPopupEl;
   },
   computed: {
     /**
@@ -97,6 +92,7 @@ export default {
       const taskId = this.root.state.popupData.taskId;
       const prevTaskId = this.root.state.popupData.prevTaskId;
       const localization = this.root.state.options.locale.dependencyPopup;
+      const dependencyLineEl = this.root.state.popupData.dependencyLineEl;
       if (!taskId || !prevTaskId || !localization) {
         return null;
       }
@@ -122,11 +118,7 @@ export default {
             value: this.getFormatedDuration(deependencyInfo.slippage),
           },
         ],
-        dependencyType: deependencyInfo.type,
-        tasks: {
-          task,
-          prevTask,
-        },
+        dependencyLineEl,
       };
     },
   },
@@ -136,41 +128,20 @@ export default {
      */
     info() {
       const defaultStyles = this.root.style['chart-tasks-dependency-popup'];
-      if (!this.info) {
+      if (this.info == null) {
         this.styles = {
           ...defaultStyles,
         };
         return;
       }
-      const fromTask = this.info.tasks.prevTask;
-      const toTask = this.info.tasks.task;
-      let startX, stopX;
-      switch (this.info.dependencyType) {
-        case 'startToStart':
-          startX = fromTask.xP;
-          stopX = toTask.xP;
-          break;
-        case 'endToEnd':
-          startX = fromTask.xP + fromTask.widthP;
-          stopX = toTask.xP + toTask.widthP;
-          break;
-        case 'startToEnd':
-          startX = fromTask.xP;
-          stopX = toTask.xP + toTask.widthP;
-          break;
-        case 'endToStart':
-        default:
-          startX = fromTask.xP + fromTask.widthP;
-          stopX = toTask.xP;
-          break;
-      }
       const popupWidth = this.root.state.options.dependencyPopup.width;
-      this.position.left = startX + (stopX - startX) / 2 - popupWidth / 2;
-      this.position.top = Math.max(fromTask.yP, toTask.yP) + this.root.state.options.row.height;
+      const depLineRect = this.info.dependencyLineEl.getBoundingClientRect();
+      const left = depLineRect.left + depLineRect.width / 2 - popupWidth / 2 + 'px';
+      const top = depLineRect.bottom + TOP_OFFSET + 'px';
 
       this.styles = {
-        left: this.position.left + 'px',
-        top: this.position.top + 'px',
+        left,
+        top,
         width: popupWidth + 'px',
         ...defaultStyles,
       };
