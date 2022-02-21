@@ -145,12 +145,6 @@ function getOptions(userOptions) {
         displayIfTaskListHidden: true, //*
         offset: 4, //*
         size: 18
-      },
-      title: {
-        display: false,
-        offsetX: 0,
-        offsetY: 0,
-        html: false
       }
     },
     taskList: {
