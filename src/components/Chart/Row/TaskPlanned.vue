@@ -35,7 +35,6 @@
       @touchmove="emitEvent('touchmove', $event)"
       @touchend="emitEvent('touchend', $event)"
       xmlns="http://www.w3.org/2000/svg"
-      ref="taskBar"
     >
       <rect
         class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-bar-polygon-estimated"

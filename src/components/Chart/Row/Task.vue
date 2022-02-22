@@ -50,7 +50,6 @@
       @touchmove="emitEvent('touchmove', $event)"
       @touchend="emitEvent('touchend', $event)"
       xmlns="http://www.w3.org/2000/svg"
-      ref="taskBar"
     >
       <defs>
         <clipPath :id="clipPathId">
