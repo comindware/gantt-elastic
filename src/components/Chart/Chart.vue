@@ -57,7 +57,6 @@
           >
             <days-highlight></days-highlight>
             <grid></grid>
-            <dependency-lines :tasks="root.visibleTasks"></dependency-lines>
             <g
               class="gantt-elastic__chart-row-wrapper"
               :style="{ ...root.style['chart-row-wrapper'] }"
@@ -68,6 +67,7 @@
               <task-planned :task="task"></task-planned>
               <component :task="task" v-if="root.state.options.showExpected" :is="task.type"></component>
             </g>
+            <dependency-lines :tasks="root.visibleTasks"></dependency-lines>
           </svg>
           <dependency-popup></dependency-popup>
         </div>

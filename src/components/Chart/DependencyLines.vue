@@ -42,6 +42,16 @@
 </template>
 
 <script>
+const dependencyTypes = {
+  startToStart: 'startToStart',
+  endToEnd: 'endToEnd',
+  startToEnd: 'startToEnd',
+  endToStart: 'endToStart'
+}
+const axis = {
+  x: 'x',
+  y: 'y'
+}
 export default {
   name: 'DependencyLines',
   inject: ['root'],
@@ -49,6 +59,9 @@ export default {
   data() {
     return {};
   },
+
+  
+
   methods: {
     /**
      * Get path points
@@ -72,28 +85,29 @@ export default {
 
       let startX, stopX;
       switch (dependencyType) {
-        case 'startToStart':
+        case dependencyTypes.startToStart:
           startX = fromTask.xP;
           stopX = toTask.xP;
           break;
-        case 'endToEnd':
+        case dependencyTypes.endToEnd:
           startX = fromTask.xP + fromTask.widthP;
           stopX = toTask.xP + toTask.widthP;
           break;
-        case 'startToEnd':
+        case dependencyTypes.startToEnd:
           startX = fromTask.xP;
           stopX = toTask.xP + toTask.widthP;
           break;
-        case 'endToStart':
+        case dependencyTypes.endToStart:
         default:
           startX = fromTask.xP + fromTask.widthP;
           stopX = toTask.xP;
           break;
       }
-      const startY = fromTask.yP + fromTask.height / 2;
-      const stopY = toTask.yP + toTask.height / 2;
+      const lineMargin = 4
+      const startY = (fromTask.yP + fromTask.height / 2) + lineMargin;
+      const stopY = (toTask.yP + toTask.height / 2) - lineMargin;
 
-      const distanceX = stopX - startX;
+      let distanceX = stopX - startX;
       let distanceY;
       let yMultiplier = 1;
       if (stopY >= startY) {
@@ -102,32 +116,68 @@ export default {
         distanceY = startY - stopY;
         yMultiplier = -1;
       }
-      const offset = 10;
-      const roundness = 4;
-      const isBefore = distanceX <= offset + roundness;
-      let points = `M ${startX} ${startY}
-          L ${startX + offset},${startY} `;
-      if (isBefore) {
-        points += `Q ${startX + offset + roundness},${startY} ${startX + offset + roundness},${startY +
-          roundness * yMultiplier}
-            L ${startX + offset + roundness},${startY + (distanceY * yMultiplier) / 2 - roundness * yMultiplier}
-            Q ${startX + offset + roundness},${startY + (distanceY * yMultiplier) / 2} ${startX + offset},${startY +
-          (distanceY * yMultiplier) / 2}
-            L ${startX - offset + distanceX},${startY + (distanceY * yMultiplier) / 2}
-            Q ${startX - offset + distanceX - roundness},${startY + (distanceY * yMultiplier) / 2} ${startX -
-          offset +
-          distanceX -
-          roundness},${startY + (distanceY * yMultiplier) / 2 + roundness * yMultiplier}
-            L ${startX - offset + distanceX - roundness},${stopY - roundness * yMultiplier}
-            Q ${startX - offset + distanceX - roundness},${stopY} ${startX - offset + distanceX},${stopY}
-            L ${stopX},${stopY}`;
-      } else {
-        points += `L ${startX + distanceX / 2 - roundness},${startY}
-            Q ${startX + distanceX / 2},${startY} ${startX + distanceX / 2},${startY + roundness * yMultiplier}
-            L ${startX + distanceX / 2},${stopY - roundness * yMultiplier}
-            Q ${startX + distanceX / 2},${stopY} ${startX + distanceX / 2 + roundness},${stopY}
-            L ${stopX},${stopY}`;
+      let xMultiplier = 1;
+      if (stopX >= startX) {
+        xMultiplier = -1
       }
+      let offset = 10;
+      let roundness = 4;
+      const isBefore = distanceX <= offset + roundness;
+      let startMove = 0;
+      if (!isBefore && (dependencyType === dependencyTypes.endToEnd)) {
+        offset += distanceX;
+      } else if (isBefore && dependencyType === dependencyTypes.startToStart) {
+        offset -= distanceX; 
+      }
+      if (dependencyType === dependencyTypes.startToStart || dependencyType === dependencyTypes.startToEnd) {
+        startMove -= offset;
+      } else {
+        startMove += offset
+      }
+      const cursour = {x: 0, y: 0};
+      let points = `
+        ${this.moveCursor(cursour, startX, startY)} 
+        ${this.getLine(cursour, startMove, 0)}`;
+      if (dependencyType === dependencyTypes.startToStart) {
+        xMultiplier = -1
+      } else if (dependencyType === dependencyTypes.endToEnd || dependencyType === dependencyTypes.endToStart) {
+        xMultiplier = 1
+      }
+      points += `
+        ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.y)}`
+      distanceX = stopX - cursour.x;
+      distanceY -= roundness;
+      if (distanceX >= 0) {
+        xMultiplier = 1
+      } else {
+        xMultiplier = -1
+      }
+      if (isBefore && dependencyType === dependencyTypes.endToStart) {
+        points += `
+          ${this.getLine(cursour, 0, (((distanceY - toTask.height / 2)) - roundness) * yMultiplier)}
+          ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.x)}
+          ${this.getLine(cursour, distanceX - 10 , 0)}
+          ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.y)}`;
+          xMultiplier = xMultiplier * -1;
+      } else if (!isBefore && dependencyType === dependencyTypes.startToEnd) {
+        points += `
+          ${this.getLine(cursour, 0, (((distanceY - toTask.height / 2)) - roundness) * yMultiplier)}
+          ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.x)}
+          ${this.getLine(cursour, distanceX + 10 , 0)}
+          ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.y)}`;
+          xMultiplier = xMultiplier * -1;
+      }
+      if (stopY >= cursour.y) {
+        distanceY = stopY - cursour.y;
+      } else {
+        distanceY = cursour.y - stopY;
+      }
+      points += `
+        ${this.getLine(cursour, 0, ((distanceY - roundness / 2)) * yMultiplier)}
+        ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.x)}`;
+      distanceX = stopX - cursour.x;
+      points += 
+        `${this.getLine(cursour, distanceX, 0)}`;
       return points;
     },
     onDependencyLineClick(event, dependencyLine) {
@@ -136,6 +186,38 @@ export default {
         prevTaskId: dependencyLine.prevTaskId,
         dependencyLineEl: event.target
       };
+    },
+
+    getCorner(cursour, roundness, yMultiplier, xMultiplier, side) {
+      let resultPoint = {};
+      switch (side) {
+        case axis.y:
+          cursour.x += roundness * xMultiplier;
+          resultPoint = {
+            x: cursour.x,
+            y: cursour.y + roundness * yMultiplier
+          };
+          break;
+        case axis.x:
+          cursour.y += roundness * yMultiplier;
+          resultPoint = {
+            x: cursour.x + roundness * xMultiplier,
+            y: cursour.y 
+          };
+      }
+      return `Q ${cursour.x},${cursour.y} ${resultPoint.x},${resultPoint.y}`;
+    },
+
+    moveCursor(cursour, x, y){
+      cursour.x = x;
+      cursour.y = y;
+      return `M ${cursour.x} ${cursour.y}`;
+    },
+
+    getLine(cursour, moveX, moveY) {
+      cursour.x += moveX;
+      cursour.y += moveY; 
+      return `L ${cursour.x} ${cursour.y}`;
     }
   },
   computed: {
