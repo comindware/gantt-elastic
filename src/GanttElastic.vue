@@ -554,7 +554,8 @@ const GanttElastic = {
         popupData: {
           taskId: '',
           prevTaskId: '',
-          dependencyLineEl: null
+          dependencyLineEl: null,
+          dependencyLineRect: null
         },
         dynamicStyle: {},
         refs: {},
@@ -1204,8 +1205,29 @@ const GanttElastic = {
       if (popup && !popup.contains(event.target)) {
         this.state.popupData = {
           taskId: '',
-          prevTaskId: ''
+          prevTaskId: '',
+          dependencyLineEl: null,
+          dependencyLineRect: null
         };
+      }
+    },
+
+    /**
+     * scroll event handler
+     */
+    onScroll(event) {
+      const popupData = this.state.popupData;
+      if (popupData.dependencyLineEl && popupData.dependencyLineRect) {
+        const oldRect = popupData.dependencyLineRect;
+        const newRect = popupData.dependencyLineEl.getBoundingClientRect();
+        if (newRect.top != oldRect.top || newRect.left != oldRect.left) {
+          this.state.popupData = {
+            taskId: '',
+            prevTaskId: '',
+            dependencyLineEl: null,
+            dependencyLineRect: null
+          };
+        }
       }
     },
 
@@ -1222,6 +1244,7 @@ const GanttElastic = {
       this.$on('taskList-width-change', this.onTaskListWidthChange);
       this.$on('taskList-column-width-change', this.onTaskListColumnWidthChange);
       document.addEventListener('click', this.onClick);
+      document.addEventListener('scroll', this.onScroll, true);
     },
 
     /**
@@ -1833,6 +1856,7 @@ const GanttElastic = {
     this.state.unwatchOutputOptions();
     this.state.unwatchOutputStyle();
     document.removeEventListener('click', this.onClick);
+    document.removeEventListener('scroll', this.onScroll);
     this.$emit('before-destroy');
   },
 

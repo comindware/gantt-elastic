@@ -184,7 +184,8 @@ export default {
       this.root.state.popupData = {
         taskId: dependencyLine.taskId,
         prevTaskId: dependencyLine.prevTaskId,
-        dependencyLineEl: event.target
+        dependencyLineEl: event.target,
+        dependencyLineRect: event.target.getBoundingClientRect()
       };
     },
 
