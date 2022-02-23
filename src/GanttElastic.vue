@@ -1222,6 +1222,7 @@ const GanttElastic = {
       this.$on('taskList-width-change', this.onTaskListWidthChange);
       this.$on('taskList-column-width-change', this.onTaskListColumnWidthChange);
       document.addEventListener('click', this.onClick);
+      document.addEventListener('scroll', this.onClick, true);
     },
 
     /**
@@ -1833,6 +1834,7 @@ const GanttElastic = {
     this.state.unwatchOutputOptions();
     this.state.unwatchOutputStyle();
     document.removeEventListener('click', this.onClick);
+    document.removeEventListener('scroll', this.onClick);
     this.$emit('before-destroy');
   },
 
