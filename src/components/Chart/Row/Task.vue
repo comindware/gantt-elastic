@@ -92,7 +92,6 @@
         class="gantt-elastic__chart-row-title-wrapper"
         :task="task"
         :style="{ ...task.style['chart-row-title-wrapper'] }"
-        @click="onBarClick($event)"
       >
         <div
           class="gantt-elastic__chart-row-title-text"
