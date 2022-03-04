@@ -571,7 +571,8 @@ const GanttElastic = {
         unwatchOutputTasks: null,
         unwatchOutputOptions: null,
         unwatchOutputStyle: null
-      }
+      },
+      isGridPainted: true
     };
   },
 
@@ -1194,6 +1195,15 @@ const GanttElastic = {
      */
     onTaskListColumnWidthChange() {
       this.calculateTaskListColumnsDimensions();
+      const isNeedToRepaint = (this.state.options.clientWidth - this.state.options.taskList.finalWidth) > this.state.options.width;
+      if (isNeedToRepaint && this.isGridPainted) {
+        window.requestAnimationFrame( () => {
+          this.recalculateTimes();
+          this.calculateSteps();
+          this.isGridPainted = true;
+        });
+        this.isGridPainted = false;
+      }
       this.fixScrollPos();
     },
 
@@ -1258,6 +1268,7 @@ const GanttElastic = {
       this.state.options.times.timePerPixel =
         this.state.options.times.timeScale * steps * percent + Math.pow(2, this.state.options.times.timeZoom);
       const calendarWidth = this.state.options.clientWidth - this.state.options.taskList.finalWidth;
+      let widthsNotEquals = true;
       do {
         this.state.options.times.totalViewDurationMs = dayjs(this.state.options.times.lastTime).diff(
           this.state.options.times.firstTime,
@@ -1267,11 +1278,12 @@ const GanttElastic = {
           this.state.options.times.totalViewDurationMs / this.state.options.times.timePerPixel;
         this.state.options.width =
           this.state.options.times.totalViewDurationPx + this.style['grid-line-vertical']['stroke-width'];
-        if (calendarWidth > this.state.options.width) {
+        widthsNotEquals = calendarWidth > this.state.options.width && calendarWidth - this.state.options.width > 0.1;
+        if (widthsNotEquals) {
           const width = (calendarWidth - this.state.options.width) * this.state.options.times.timePerPixel;
-          this.state.options.times.lastTime = dayjs(this.state.options.times.lastTime).add(width, 'milliseconds').endOf('day').valueOf();
-      }
-      } while (calendarWidth > this.state.options.width)
+          this.state.options.times.lastTime = dayjs(this.state.options.times.lastTime).add(width, 'milliseconds').valueOf();
+        }
+      } while (widthsNotEquals)
     },
 
     /**
