@@ -64,8 +64,8 @@
               :task="task"
               :key="task.id"
             >
-              <task-planned :task="task"></task-planned>
-              <component :task="task" v-if="root.state.options.showExpected" :is="task.type"></component>
+              <task-planned :task="task" v-if="task.durationPlanned > 0"></task-planned>
+              <component :task="task" v-if="task.duration > 0 && root.state.options.showExpected" :is="task.type"></component>
             </g>
             <dependency-lines :tasks="root.visibleTasks"></dependency-lines>
           </svg>
