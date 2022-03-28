@@ -51,19 +51,6 @@
       @touchend="emitEvent('touchend', $event)"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <defs>
-        <clipPath :id="clipPathId">
-          <rect 
-          x="0"
-          y="0"
-          width="100%"
-          height="100%"
-          rx="3"
-          ry="3"
-          >
-          </rect>
-        </clipPath>
-      </defs>
       <rect
         class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-task-polygon"
         x="0"
