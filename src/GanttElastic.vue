@@ -230,15 +230,15 @@ function getOptions(userOptions) {
         height: 20, //*
         display: true, //*
         widths: [],
-        maxWidths: { long: 40, medium: 0 },
+        maxWidths: {medium: 0, long: 160},
         format: {
           medium(date) {
             return date.week();
           },
           long(date) {
-            return date.format('wo');
+            return date.format('DD MMM');
             
-          }
+          },
         }
       },
       month: {

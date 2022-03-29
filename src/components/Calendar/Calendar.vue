@@ -433,6 +433,10 @@ export default {
             const formatFunction = week.format[formatName];
             const dateLocal = currentDate.locale(localeName);
             label = formatFunction(dateLocal);
+            if (formatName === 'long') {
+                const endWeek = currentDate.endOf('week');
+                label = `${label} - ${formatFunction(endWeek)} ${endWeek.format('YYYY')}`.toLowerCase();
+            }
             choosenFormatName = formatName;
           }
         }
