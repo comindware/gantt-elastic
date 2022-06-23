@@ -233,7 +233,7 @@ export default {
         .map(task => {
           task.dependencyLines = task.dependentOn.map(item => {
             return { 
-              points: this.getPoints(item.previousTask, task.id, item.dependencyType),
+              points: this.getPoints(item.previousTask, task.id, item.type),
               prevTaskId: item.previousTask,
               taskId: task.id,
             };
