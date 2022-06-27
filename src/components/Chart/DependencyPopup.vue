@@ -111,7 +111,7 @@ export default {
           },
           {
             title: localization.linkType,
-            value: deependencyInfo.typeText,
+            value: deependencyInfo.typeReference.name,
           },
           {
             title: localization.slippage,
