@@ -237,7 +237,7 @@ function getOptions(userOptions) {
           },
           long(date) {
             return date.format('DD MMM');
-            
+
           },
         }
       },
@@ -269,7 +269,7 @@ function getOptions(userOptions) {
             return date.format('Q');
           },
           long(date) {
-            return date.format('Q Do YYYY'); // ad hoc - localization
+            return date.format(userOptions.locale.quarterFormat); // ad hoc - localization
           }
         }
       },
