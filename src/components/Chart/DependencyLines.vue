@@ -60,7 +60,7 @@ export default {
     return {};
   },
 
-  
+
 
   methods: {
     /**
@@ -127,18 +127,18 @@ export default {
       if (!isBefore && (dependencyType === dependencyTypes.endToEnd)) {
         offset += distanceX;
       } else if (isBefore && dependencyType === dependencyTypes.startToStart) {
-        offset -= distanceX; 
+        offset -= distanceX;
       }
       if (dependencyType === dependencyTypes.startToStart || dependencyType === dependencyTypes.startToEnd) {
         startMove -= offset;
       } else {
         startMove += offset
       }
-      const cursour = {x: 0, y: 0};
+      const cursour = { x: 0, y: 0 };
       let points = `
         ${this.moveCursor(cursour, startX, startY)} 
         ${this.getLine(cursour, startMove, 0)}`;
-      if (dependencyType === dependencyTypes.startToStart) {
+      if (dependencyType === dependencyTypes.startToStart || dependencyType === dependencyTypes.startToEnd) {
         xMultiplier = -1
       } else if (dependencyType === dependencyTypes.endToEnd || dependencyType === dependencyTypes.endToStart) {
         xMultiplier = 1
@@ -156,16 +156,16 @@ export default {
         points += `
           ${this.getLine(cursour, 0, (((distanceY - toTask.height / 2)) - roundness) * yMultiplier)}
           ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.x)}
-          ${this.getLine(cursour, distanceX - 10 , 0)}
+          ${this.getLine(cursour, distanceX - 10, 0)}
           ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.y)}`;
-          xMultiplier = xMultiplier * -1;
+        xMultiplier = xMultiplier * -1;
       } else if (!isBefore && dependencyType === dependencyTypes.startToEnd) {
         points += `
           ${this.getLine(cursour, 0, (((distanceY - toTask.height / 2)) - roundness) * yMultiplier)}
           ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.x)}
-          ${this.getLine(cursour, distanceX + 10 , 0)}
+          ${this.getLine(cursour, distanceX + 10, 0)}
           ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.y)}`;
-          xMultiplier = xMultiplier * -1;
+        xMultiplier = xMultiplier * -1;
       }
       if (stopY >= cursour.y) {
         distanceY = stopY - cursour.y;
@@ -176,7 +176,7 @@ export default {
         ${this.getLine(cursour, 0, ((distanceY - roundness / 2)) * yMultiplier)}
         ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.x)}`;
       distanceX = stopX - cursour.x;
-      points += 
+      points +=
         `${this.getLine(cursour, distanceX, 0)}`;
       return points;
     },
@@ -203,13 +203,13 @@ export default {
           cursour.y += roundness * yMultiplier;
           resultPoint = {
             x: cursour.x + roundness * xMultiplier,
-            y: cursour.y 
+            y: cursour.y
           };
       }
       return `Q ${cursour.x},${cursour.y} ${resultPoint.x},${resultPoint.y}`;
     },
 
-    moveCursor(cursour, x, y){
+    moveCursor(cursour, x, y) {
       cursour.x = x;
       cursour.y = y;
       return `M ${cursour.x} ${cursour.y}`;
@@ -217,7 +217,7 @@ export default {
 
     getLine(cursour, moveX, moveY) {
       cursour.x += moveX;
-      cursour.y += moveY; 
+      cursour.y += moveY;
       return `L ${cursour.x} ${cursour.y}`;
     }
   },
@@ -232,7 +232,7 @@ export default {
         .filter(task => typeof task.dependentOn !== 'undefined')
         .map(task => {
           task.dependencyLines = task.dependentOn.map(item => {
-            return { 
+            return {
               points: this.getPoints(item.previousTask, task.id, item.typeReference.alias),
               prevTaskId: item.previousTask,
               taskId: task.id,
