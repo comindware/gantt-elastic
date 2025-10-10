@@ -138,7 +138,7 @@ export default {
       let points = `
         ${this.moveCursor(cursour, startX, startY)} 
         ${this.getLine(cursour, startMove, 0)}`;
-      if (dependencyType === dependencyTypes.startToStart) {
+      if (dependencyType === dependencyTypes.startToStart || dependencyType === dependencyTypes.startToEnd) {
         xMultiplier = -1
       } else if (dependencyType === dependencyTypes.endToEnd || dependencyType === dependencyTypes.endToStart) {
         xMultiplier = 1
