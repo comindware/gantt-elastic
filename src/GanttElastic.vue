@@ -1590,12 +1590,13 @@ const GanttElastic = {
       let lastTaskTime = 0;
       for (let index = 0, len = this.state.tasks.length; index < len; index++) {
         let task = this.state.tasks[index];
-        const taskStart = Math.min(task.startTime, task.startPlanned);
+        const plannedStart = typeof task.startPlanned === 'number' ? task.startPlanned : task.startTimePlanned;
+        const taskStart = Math.min(task.startTime, plannedStart);
         if (taskStart < firstTaskTime) {
           firstTaskTime = taskStart;
         }
-
-        const taskLastTime = Math.max(task.startTime + task.duration, task.startPlanned + task.durationPlanned);
+        const plannedDuration = typeof task.durationPlanned === 'number' ? task.durationPlanned : 0;
+        const taskLastTime = Math.max(task.startTime + task.duration, plannedStart + plannedDuration);
         if (taskLastTime > lastTaskTime) {
           lastTaskTime = taskLastTime;
         }
