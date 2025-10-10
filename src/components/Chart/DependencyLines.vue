@@ -123,6 +123,7 @@ export default {
       let offset = 10;
       let roundness = 4;
       const isBefore = distanceX <= offset + roundness;
+      const breakLine = dependencyType === dependencyTypes.startToEnd && distanceX >= -(offset + roundness) * 2 || dependencyType === dependencyTypes.endToStart && distanceX <= (offset + roundness) * 2;
       let startMove = 0;
       if (!isBefore && (dependencyType === dependencyTypes.endToEnd)) {
         offset += distanceX;
@@ -138,7 +139,7 @@ export default {
       let points = `
         ${this.moveCursor(cursour, startX, startY)} 
         ${this.getLine(cursour, startMove, 0)}`;
-      if (dependencyType === dependencyTypes.startToStart) {
+      if (dependencyType === dependencyTypes.startToStart || dependencyType === dependencyTypes.startToEnd) {
         xMultiplier = -1
       } else if (dependencyType === dependencyTypes.endToEnd || dependencyType === dependencyTypes.endToStart) {
         xMultiplier = 1
@@ -147,19 +148,22 @@ export default {
         ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.y)}`
       distanceX = stopX - cursour.x;
       distanceY -= roundness;
-      if (distanceX >= 0) {
-        xMultiplier = 1
+      if (breakLine) {        
+        xMultiplier = xMultiplier * -1;
+      } else if (distanceX >= 0) {
+          xMultiplier = 1
       } else {
         xMultiplier = -1
       }
-      if (isBefore && dependencyType === dependencyTypes.endToStart) {
+      
+      if (breakLine && dependencyType === dependencyTypes.endToStart) {
         points += `
           ${this.getLine(cursour, 0, (((distanceY - toTask.height / 2)) - roundness) * yMultiplier)}
           ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.x)}
           ${this.getLine(cursour, distanceX - 10 , 0)}
           ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.y)}`;
           xMultiplier = xMultiplier * -1;
-      } else if (!isBefore && dependencyType === dependencyTypes.startToEnd) {
+      } else if (breakLine && dependencyType === dependencyTypes.startToEnd) {
         points += `
           ${this.getLine(cursour, 0, (((distanceY - toTask.height / 2)) - roundness) * yMultiplier)}
           ${this.getCorner(cursour, roundness, yMultiplier, xMultiplier, axis.x)}
